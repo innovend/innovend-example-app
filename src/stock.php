@@ -30,22 +30,54 @@ if ($httpStatus === 200) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll("img").forEach(img => {
+                img.onerror = () => {
+                    img.src = "fallback.png";
+                };
+            });
+        });
+    </script>
     <meta charset="UTF-8">
     <title>Select a product</title>
     <style>
+        body {
+            font-family: sans-serif;
+            background: #f9f9f9;
+            padding: 20px;
+        }
+        h1 {
+            color: #444;
+        }
         .product-card {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 15px;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px;
             width: 250px;
             display: inline-block;
             vertical-align: top;
             text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 6px;
         }
         .product-card img {
             max-width: 100%;
-            height: 100px;
+            height: 120px;
             object-fit: contain;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
         }
     </style>
 </head>
