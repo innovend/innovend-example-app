@@ -32,23 +32,44 @@ if ($httpStatus === 200) {
 <head>
     <meta charset="UTF-8">
     <title>Select a product</title>
+    <style>
+        .product-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 15px;
+            width: 250px;
+            display: inline-block;
+            vertical-align: top;
+            text-align: center;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: 100px;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body>
 <h1>Ticket: <?= htmlspecialchars($ticket) ?></h1>
-<form method="POST" action="reserve.php">
-    <input type="hidden" name="machineId" value="<?= $machineId ?>">
-    <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticket) ?>">
-    <label for="productSku">Product:</label>
-    <select name="productSku" id="productSku">
-        <?php foreach ($products as $product):
-            $available = $product['AvailableCountExReservations'];
-            $name = $product['ProductName'] ?? 'Unnamed';
-            $sku = $product['ProductSKU'] ?? '';
-            echo "<option value=\"".htmlspecialchars($sku)."\">($available) ".htmlspecialchars($name)."</option>";
-        endforeach; ?>
-    </select>
-    <br><br>
-    <button type="submit">Reserve product</button>
-</form>
+
+<?php foreach ($products as $product):
+    $available = $product['AvailableCountExReservations'];
+    $name = $product['ProductName'] ?? 'Unnamed';
+    $sku = $product['ProductSKU'] ?? '';
+    $productId = $product['ProductId'];
+    $imageUrl = "image.php?product={$productId}";
+    ?>
+    <div class="product-card">
+        <img src="<?= $imageUrl ?>" alt="<?= htmlspecialchars($name) ?>">
+        <h3><?= htmlspecialchars($name) ?></h3>
+        <p>Available: <?= $available ?></p>
+        <form method="POST" action="reserve.php">
+            <input type="hidden" name="productSku" value="<?= htmlspecialchars($sku) ?>">
+            <input type="hidden" name="machineId" value="<?= $machineId ?>">
+            <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticket) ?>">
+            <button type="submit">Reserve</button>
+        </form>
+    </div>
+<?php endforeach; ?>
 </body>
 </html>
