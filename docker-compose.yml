@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  web:
+    image: php:8.2-apache
+    container_name: php-vending-web
+    volumes:
+      - ./src:/var/www/html
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+    network_mode: "host"
