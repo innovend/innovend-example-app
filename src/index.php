@@ -1,35 +1,6 @@
 <?php
-// Load config
-$config = json_decode(file_get_contents('config.json'), true);
-
-// API request to fetch vending machines
-$url = "https://api.vendingweb.eu/api/external/machines";
-$headers = [
-    "x-api-key: {$config['apiKey']}",
-    "Accept: application/json"
-];
-
-$curl = curl_init($url);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($curl, CURLOPT_USERPWD, $config['username'] . ":" . $config['password']);
-curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true); // false voor lokaal testen indien nodig
-
-$response = curl_exec($curl);
-if (curl_errno($curl)) {
-    die("Error contacting API: " . curl_error($curl));
-}
-$httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-curl_close($curl);
-
-if ($httpStatus !== 200) {
-    die("API returned status $httpStatus: " . htmlspecialchars($response));
-}
-
-$machines = json_decode($response, true);
-
-// Sorteer op ID
-usort($machines, fn($a, $b) => $a['Id'] <=> $b['Id']);
+// Genereer ServiceNow ticketnummer (voorbeeld: INC123456)
+$ticketNumber = "INC" . rand(100000, 999999);
 ?>
 
 <!DOCTYPE html>
@@ -46,16 +17,41 @@ usort($machines, fn($a, $b) => $a['Id'] <=> $b['Id']);
     </script>
 </head>
 <body>
-<h1>Select a vending machine</h1>
+<h1>Ticket number: <?= htmlspecialchars($ticketNumber) ?></h1>
+
 <form id="machineForm" method="GET" action="stock.php">
+    <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticketNumber) ?>">
     <label for="vendingmachine">Location:</label>
     <select name="vendingmachine" id="vendingmachine" onchange="submitFormIfValid(this)">
         <option value="">Select a location</option>
-        <?php foreach ($machines as $machine): ?>
-            <option value="<?= htmlspecialchars($machine['Id']) ?>">
-                <?= htmlspecialchars($machine['Id']) ?> - <?= htmlspecialchars($machine['Name']) ?>
-            </option>
-        <?php endforeach; ?>
+        <?php
+        $config = json_decode(file_get_contents('config.json'), true);
+        $url = "https://api.vendingweb.eu/api/external/machines";
+        $headers = [
+            "x-api-key: {$config['apiKey']}",
+            "Accept: application/json"
+        ];
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $config['username'] . ":" . $config['password']);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+
+        $response = curl_exec($curl);
+        $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($httpStatus === 200) {
+            $machines = json_decode($response, true);
+            usort($machines, fn($a, $b) => $a['Id'] <=> $b['Id']);
+            foreach ($machines as $machine) {
+                echo "<option value=\"{$machine['Id']}\">{$machine['Id']} - {$machine['Name']}</option>";
+            }
+        } else {
+            echo "<option disabled>Error loading machines</option>";
+        }
+        ?>
     </select>
 </form>
 </body>

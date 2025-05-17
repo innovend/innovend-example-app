@@ -1,14 +1,9 @@
 <?php
-// Load config
 $config = json_decode(file_get_contents('config.json'), true);
 
-// Get machine ID from URL
-$machineId = isset($_GET['vendingmachine']) ? intval($_GET['vendingmachine']) : 0;
-if (!$machineId) {
-    die("No vending machine selected.");
-}
+$machineId = intval($_GET['vendingmachine']);
+$ticket = $_GET['ticket'] ?? 'UNKNOWN';
 
-// Prepare API request
 $url = "https://api.vendingweb.eu/api/external/machines/stock/{$machineId}";
 $headers = [
     "x-api-key: {$config['apiKey']}",
@@ -19,21 +14,17 @@ $curl = curl_init($url);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($curl, CURLOPT_USERPWD, $config['username'] . ":" . $config['password']);
-curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true); // false voor lokaal
+curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
 
 $response = curl_exec($curl);
-if (curl_errno($curl)) {
-    die("Error contacting API: " . curl_error($curl));
-}
 $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 curl_close($curl);
 
-if ($httpStatus !== 200) {
-    die("API returned status $httpStatus: " . htmlspecialchars($response));
+$products = [];
+if ($httpStatus === 200) {
+    $data = json_decode($response, true);
+    $products = $data['ProductStock'] ?? [];
 }
-
-$data = json_decode($response, true);
-$products = $data['ProductStock'] ?? [];
 ?>
 
 <!DOCTYPE html>
@@ -43,16 +34,17 @@ $products = $data['ProductStock'] ?? [];
     <title>Select a product</title>
 </head>
 <body>
-<h1>Select a product from machine #<?= htmlspecialchars($machineId) ?></h1>
+<h1>Ticket: <?= htmlspecialchars($ticket) ?></h1>
 <form method="POST" action="reserve.php">
-    <input type="hidden" name="machineId" value="<?= htmlspecialchars($machineId) ?>">
-    <label for="product">Product:</label>
-    <select name="productId" id="product">
+    <input type="hidden" name="machineId" value="<?= $machineId ?>">
+    <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticket) ?>">
+    <label for="productSku">Product:</label>
+    <select name="productSku" id="productSku">
         <?php foreach ($products as $product):
             $available = $product['AvailableCountExReservations'];
-            $name = $product['ProductName'] ?? 'Unnamed product';
-            $id = $product['ProductId'];
-            echo "<option value=\"" . htmlspecialchars($id) . "\">($available) " . htmlspecialchars($name) . "</option>";
+            $name = $product['ProductName'] ?? 'Unnamed';
+            $sku = $product['ProductSKU'] ?? '';
+            echo "<option value=\"".htmlspecialchars($sku)."\">($available) ".htmlspecialchars($name)."</option>";
         endforeach; ?>
     </select>
     <br><br>
