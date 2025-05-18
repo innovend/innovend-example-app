@@ -1,38 +1,8 @@
-<?php
-// Genereer ticketnummer bij iedere pagina-refresh
-$ticketNumber = "INC" . rand(100000, 999999);
-
-// Haal machinegegevens op
-$config = json_decode(file_get_contents('config.json'), true);
-$url = "https://api.vendingweb.eu/api/external/machines";
-$headers = [
-    "x-api-key: {$config['apiKey']}",
-    "Accept: application/json"
-];
-
-$curl = curl_init($url);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($curl, CURLOPT_USERPWD, $config['username'] . ":" . $config['password']);
-curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
-
-$response = curl_exec($curl);
-$httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-curl_close($curl);
-
-$machines = [];
-
-if ($httpStatus === 200) {
-    $machines = json_decode($response, true);
-    usort($machines, fn($a, $b) => $a['Id'] <=> $b['Id']);
-}
-?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>Select a vending machine</title>
+    <title>Product Reservering Systeem</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,57 +24,27 @@ if ($httpStatus === 200) {
             width: 400px;
         }
 
-        select, button {
-            padding: 10px;
-            font-size: 16px;
-            margin-top: 10px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        button {
+        .start-button {
             background-color: #007bff;
             color: white;
             border: none;
             border-radius: 4px;
+            padding: 15px 30px;
+            font-size: 18px;
             cursor: pointer;
-            margin-top: 20px;
+            transition: background-color 0.3s;
         }
 
-        button:hover {
+        .start-button:hover {
             background-color: #0056b3;
         }
-
-        .ticket {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #333;
-        }
     </style>
-    <script>
-        function submitFormIfValid(select) {
-            if (select.value !== "") {
-                document.getElementById('machineForm').submit();
-            }
-        }
-    </script>
 </head>
 <body>
-<div class="container">
-    <div class="ticket">Ticket number: <?= htmlspecialchars($ticketNumber) ?></div>
-    <form id="machineForm" method="GET" action="stock.php">
-        <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticketNumber) ?>">
-        <label for="vendingmachine">Select a location:</label>
-        <select name="vendingmachine" id="vendingmachine" onchange="submitFormIfValid(this)">
-            <option value="">Select a location</option>
-            <?php foreach ($machines as $machine): ?>
-                <option value="<?= htmlspecialchars($machine['Id']) ?>">
-                    <?= htmlspecialchars($machine['Id']) ?> - <?= htmlspecialchars($machine['Name']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </form>
-</div>
+    <div class="container">
+        <h1>ITSM Demo application</h1>
+        <p>This application demonstrates automated flows as they can be implemented in </p>
+        <a href="start.php" class="start-button">Start</a>
+    </div>
 </body>
 </html>
