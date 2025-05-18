@@ -56,8 +56,9 @@
     <div class="container">
         <h1>ITSM Demo application</h1>
         <p>This application demonstrates automated flows as they can be implemented in </p>
-        <a href="start.php" class="button">Start</a>
-        <a href="status.php" class="button status">Toon reserveringsstatus</a>
+        <a href="start.php" class="button">Start asset reservation</a>
+        <a href="status.php" class="button status">Asset reservation overview</a>
+        <a href="ondemand.php" class="button">Show On Demand Asset Usage</a>
     </div>
 </body>
 </html>
