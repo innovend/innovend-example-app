@@ -24,7 +24,8 @@
             width: 400px;
         }
 
-        .start-button {
+        .button {
+            display: inline-block;
             background-color: #007bff;
             color: white;
             border: none;
@@ -33,10 +34,21 @@
             font-size: 18px;
             cursor: pointer;
             transition: background-color 0.3s;
+            text-decoration: none;
+            margin: 10px;
+            width: 80%;
         }
 
-        .start-button:hover {
+        .button:hover {
             background-color: #0056b3;
+        }
+
+        .button.status {
+            background-color: #28a745;
+        }
+
+        .button.status:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -44,7 +56,8 @@
     <div class="container">
         <h1>ITSM Demo application</h1>
         <p>This application demonstrates automated flows as they can be implemented in </p>
-        <a href="start.php" class="start-button">Start</a>
+        <a href="start.php" class="button">Start</a>
+        <a href="status.php" class="button status">Toon reserveringsstatus</a>
     </div>
 </body>
 </html>
