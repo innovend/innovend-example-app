@@ -1,6 +1,57 @@
 <?php
 $config = json_decode(file_get_contents('config.json'), true);
 
+// Voeg deze functie toe voor het annuleren van reserveringen
+function cancelReservation($stockreservationId, $machineId, $deliveryDate) {
+    global $config;
+    
+    $cancelUrl = "https://api.vendingweb.eu/api/external/stockreservations/update/false/true";
+    
+    $headers = [
+        "x-api-key: {$config['apiKey']}",
+        "Accept: application/json",
+        "Content-Type: application/json"
+    ];
+
+    $requestBody = json_encode([
+        [
+            "Id" => $stockreservationId,
+            "MachineId" => $machineId,
+            "DeliveryDate" => $deliveryDate,
+            "StatusId" => 9,
+            "IsPaid" => true
+        ]
+    ]);
+
+    $curl = curl_init($cancelUrl);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_USERPWD, $config['username'] . ":" . $config['password']);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
+
+    $response = curl_exec($curl);
+    $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    return $httpStatus === 200;
+}
+
+// Verwerk annulering als het formulier is verzonden
+if (isset($_POST['cancel']) && isset($_POST['reservationId']) && isset($_POST['machineId']) && isset($_POST['deliveryDate'])) {
+    $success = cancelReservation(
+        (int)$_POST['reservationId'],
+        (int)$_POST['machineId'],
+        $_POST['deliveryDate']
+    );
+    
+    if ($success) {
+        header("Location: " . $_SERVER['REQUEST_URI']);
+        exit;
+    }
+}
+
 // Get machines for dropdown
 $machinesUrl = "https://api.vendingweb.eu/api/external/machines";
 $headers = [
@@ -191,6 +242,19 @@ function getStatusText($statusId) {
             padding: 2px 6px;
             border-radius: 4px;
         }
+
+        .cancel-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cancel-button:hover {
+            background-color: #c82333;
+        }
     </style>
     <script>
         function submitForm() {
@@ -232,6 +296,7 @@ function getStatusText($statusId) {
                     <th>Unlock Code</th>
                     <th>First Name</th>
                     <th>Last Name</th>
+                    <th>Acties</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -242,7 +307,7 @@ function getStatusText($statusId) {
                             <td><?= htmlspecialchars(date('Y-m-d H:i', strtotime($reservation['CreatedOn']))) ?></td>
                             <td><?= htmlspecialchars(date('Y-m-d', strtotime($reservation['DeliveryDate']))) ?></td>
                             <td><?= $reservation['DeliveredOn'] ? htmlspecialchars(date('Y-m-d H:i', strtotime($reservation['DeliveredOn']))) : '-' ?></td>
-                            <td><?= htmlspecialchars(date('Y-m-d H:i', strtotime($reservation['ExpirationDate']))) ?></td>
+                            <td><?= $reservation['ExpirationDate'] ? htmlspecialchars(date('Y-m-d H:i', strtotime($reservation['ExpirationDate']))) : '-' ?></td>
                             <td>
                                         <span class="status <?=
                                         match ($reservation['StatusId']) {
@@ -261,6 +326,16 @@ function getStatusText($statusId) {
                             <td><span class="unlock-code"><?= htmlspecialchars($reservation['UnlockCode']) ?></span></td>
                             <td><?= htmlspecialchars($reservation['FirstName'] ?: '-') ?></td>
                             <td><?= htmlspecialchars($reservation['LastName'] ?: '-') ?></td>
+                            <td>
+                                <?php if ($reservation['StatusId'] === 1): ?>
+                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel the reservation?');">
+                                        <input type="hidden" name="reservationId" value="<?= htmlspecialchars($reservation['Id']) ?>">
+                                        <input type="hidden" name="machineId" value="<?= htmlspecialchars($reservation['MachineId']) ?>">
+                                        <input type="hidden" name="deliveryDate" value="<?= htmlspecialchars($reservation['DeliveryDate']) ?>">
+                                        <button type="submit" name="cancel" class="cancel-button">Cancel</button>
+                                    </form>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endforeach; ?>
