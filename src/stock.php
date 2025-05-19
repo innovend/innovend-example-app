@@ -24,7 +24,12 @@ $products = [];
 if ($httpStatus === 200) {
     $data = json_decode($response, true);
     $products = $data['ProductStock'] ?? [];
+    // Filter producten met ProductId 0
+    $products = array_filter($products, function($product) {
+        return isset($product['ProductId']) && $product['ProductId'] !== 0;
+    });
 }
+
 ?>
 
 <!DOCTYPE html>

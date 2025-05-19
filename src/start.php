@@ -49,7 +49,7 @@ if ($httpStatus === 200) {
             background: #fff;
             padding: 30px 40px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 400px;
         }
@@ -93,11 +93,13 @@ if ($httpStatus === 200) {
 <body>
 <div class="container">
     <div class="ticket">Ticket number: <?= htmlspecialchars($ticketNumber) ?></div>
+    <p>An employee made a request for an asset in your ITSM application. The request is approved. First select the
+        desired IT vending machine location from the dropdown.</p>
     <form id="machineForm" method="GET" action="stock.php">
         <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticketNumber) ?>">
         <label for="vendingmachine">Select a location:</label>
         <select name="vendingmachine" id="vendingmachine" onchange="submitFormIfValid(this)">
-            <option value="">Select a location</option>
+            <option value="">IT Vending Machine location</option>
             <?php foreach ($machines as $machine): ?>
                 <option value="<?= htmlspecialchars($machine['Id']) ?>">
                     <?= htmlspecialchars($machine['Id']) ?> - <?= htmlspecialchars($machine['Name']) ?>
