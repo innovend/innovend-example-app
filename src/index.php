@@ -59,6 +59,7 @@
         <a href="start.php" class="button">Start asset reservation</a>
         <a href="status.php" class="button">Asset reservation overview</a>
         <a href="ondemand.php" class="button">Show On Demand Asset Usage</a>
+        <a href="return.php" class="button">Create return to locker code</a>
     </div>
 </body>
 </html>
