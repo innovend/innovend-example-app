@@ -88,6 +88,10 @@ if ($httpStatus === 200) {
 </head>
 <body>
 <h1>Ticket: <?= htmlspecialchars($ticket) ?></h1>
+<form id="reserveForm" method="POST" action="reserve.php">
+    <input type="hidden" name="machineId" value="<?= $machineId ?>">
+    <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticket) ?>">
+</form>
 
 <?php foreach ($products as $product):
     $available = $product['AvailableCountExReservations'];
@@ -100,13 +104,15 @@ if ($httpStatus === 200) {
         <img src="<?= $imageUrl ?>" alt="<?= htmlspecialchars($name) ?>">
         <h3><?= htmlspecialchars($name) ?></h3>
         <p>Available: <?= $available ?></p>
-        <form method="POST" action="reserve.php">
-            <input type="hidden" name="productSku" value="<?= htmlspecialchars($sku) ?>">
-            <input type="hidden" name="machineId" value="<?= $machineId ?>">
-            <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticket) ?>">
-            <button type="submit">Reserve</button>
-        </form>
+        <label>
+            <input type="checkbox" name="products[]" value="<?= htmlspecialchars($sku) ?>" form="reserveForm">
+            Select
+        </label>
     </div>
 <?php endforeach; ?>
+
+<div style="text-align: center; margin-top: 20px;">
+    <button type="submit" form="reserveForm" style="padding: 10px 20px; font-size: 16px;">Reserve Selected Items</button>
+</div>
 </body>
 </html>

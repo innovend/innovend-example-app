@@ -2,7 +2,7 @@
 $config = json_decode(file_get_contents('config.json'), true);
 
 $machineId = intval($_POST['machineId']);
-$sku = $_POST['productSku'];
+$products = $_POST['products'] ?? [];
 $orderNr = $_POST['ticket'] ?? 'UNKNOWN';
 
 // timestamps
@@ -15,8 +15,17 @@ function generateUnlockCode() {
 }
 
 // functie om reservering te maken
-function createReservation($config, $machineId, $orderNr, $sku, $now, $expiration) {
+function createReservation($config, $machineId, $orderNr, $products, $now, $expiration) {
     $unlockCode = generateUnlockCode();
+
+    // Create individual product entries
+    $productEntries = [];
+    foreach ($products as $sku) {
+        $productEntries[] = [
+            "SkuCode" => $sku,
+            "Qty" => 1
+        ];
+    }
 
     $payload = json_encode([
         [
@@ -27,12 +36,7 @@ function createReservation($config, $machineId, $orderNr, $sku, $now, $expiratio
             "UnlockCode" => $unlockCode,
             "OrderNr" => $orderNr,
             "IsPaid" => true,
-            "Products" => [
-                [
-                    "SkuCode" => $sku,
-                    "Qty" => 1
-                ]
-            ]
+            "Products" => $productEntries
         ]
     ]);
 
@@ -116,14 +120,31 @@ function createReservation($config, $machineId, $orderNr, $sku, $now, $expiratio
 <body>
 
 <?php
+// Check if any products were selected
+if (empty($products)) {
+    echo "
+    <div class='message error'>
+        <h1>No products selected</h1>
+        <p>Please select at least one product to reserve.</p>
+        <form action='stock.php' method='get'>
+            <input type='hidden' name='vendingmachine' value='$machineId'>
+            <input type='hidden' name='ticket' value='$orderNr'>
+            <button type='submit'>Go Back</button>
+        </form>
+    </div>";
+    exit;
+}
+
 // probeer reservering aan te maken (max 5 pogingen bij code-conflict)
 $maxAttempts = 5;
 for ($i = 0; $i < $maxAttempts; $i++) {
-    [$status, $response, $code] = createReservation($config, $machineId, $orderNr, $sku, $now, $expiration);
+    [$status, $response, $code] = createReservation($config, $machineId, $orderNr, $products, $now, $expiration);
     if ($status === 200) {
+        $productCount = count($products);
         echo "
         <div class='message success'>
             <h1>Reservation successful!</h1>
+            <p>You have reserved $productCount item" . ($productCount > 1 ? "s" : "") . ".</p>
             <p>Your unlock code: <strong>$code</strong></p>
             <form action='index.php' method='get'>
                 <button type='submit'>Return Home</button>
