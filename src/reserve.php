@@ -71,7 +71,7 @@ function createReservation($config, $machineId, $orderNr, $products, $now, $expi
     $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
 
-    return [$status, $response, $unlockCode];
+    return [$status, $response, $unlockCode, $payload, $url];
 }
 ?>
 
@@ -149,15 +149,30 @@ if (empty($products)) {
 
 // probeer reservering aan te maken (max 5 pogingen bij code-conflict)
 $maxAttempts = 5;
+$apiPayload = null;
+$apiUrl = null;
 for ($i = 0; $i < $maxAttempts; $i++) {
-    [$status, $response, $code] = createReservation($config, $machineId, $orderNr, $products, $now, $expiration);
+    [$status, $response, $code, $apiPayload, $apiUrl] = createReservation($config, $machineId, $orderNr, $products, $now, $expiration);
     if ($status === 200) {
         $productCount = count($products);
         echo "
         <div class='message success'>
             <h1>Reservation successful!</h1>
             <p>You have reserved $productCount item" . ($productCount > 1 ? "s" : "") . ".</p>
-            <p>Your unlock code: <strong>$code</strong></p>
+            <p>Your unlock code: <strong>$code</strong></p>";
+
+        if (isset($config['debug']) && $config['debug'] === true) {
+            echo "
+            <div style='margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;'>
+                <h3 style='margin-top: 0;'>API Request/Response Log</h3>
+                <p><strong>API URL:</strong> " . htmlspecialchars($apiUrl) . "</p>
+                <p><strong>Request Payload:</strong><br>" . htmlspecialchars($apiPayload ?? 'No payload data') . "</p>
+                <p><strong>Response Status:</strong> " . htmlspecialchars($status ?? 'Unknown') . "</p>
+                <p><strong>Response Body:</strong><br>" . htmlspecialchars($response ?? 'No response data') . "</p>
+            </div>";
+        }
+
+        echo "
             <form action='index.php' method='get'>
                 <button type='submit'>Return Home</button>
             </form>
@@ -170,7 +185,20 @@ for ($i = 0; $i < $maxAttempts; $i++) {
 echo "
     <div class='message error'>
         <h1>Reservation failed</h1>
-        <pre>$response</pre>
+        <pre>$response</pre>";
+
+if (isset($config['debug']) && $config['debug'] === true) {
+    echo "
+    <div style='margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;'>
+        <h3 style='margin-top: 0;'>API Request/Response Log</h3>
+        <p><strong>API URL:</strong> " . htmlspecialchars($apiUrl) . "</p>
+        <p><strong>Request Payload:</strong><br>" . htmlspecialchars($apiPayload ?? 'No payload data') . "</p>
+        <p><strong>Response Status:</strong> " . htmlspecialchars($status ?? 'Unknown') . "</p>
+        <p><strong>Response Body:</strong><br>" . htmlspecialchars($response ?? 'No response data') . "</p>
+    </div>";
+}
+
+echo "
         <form action='index.php' method='get'>
             <button type='submit'>Return Home</button>
         </form>
