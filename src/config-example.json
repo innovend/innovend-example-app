@@ -1,5 +1,6 @@
 {
   "apiKey": "",
   "username": "",
-  "password": ""
+  "password": "",
+  "debug": false
 }

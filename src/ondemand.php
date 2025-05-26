@@ -11,27 +11,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Log de binnenkomende data
         $input = file_get_contents('php://input');
         file_put_contents($logFile, date('Y-m-d H:i:s') . " - Received data: " . $input . "\n", FILE_APPEND);
-        
+
         // Decodeer de JSON data
         $data = json_decode($input, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception("Invalid JSON: " . json_last_error_msg());
         }
-        
+
+        // Check if SQLite3 extension is available
+        if (!class_exists('SQLite3')) {
+            throw new Exception("SQLite3 extension is not enabled. Please see README.md for instructions on enabling SQLite3.");
+        }
+
         // Database verbinding
         $db = new SQLite3($dbFile);
         file_put_contents($logFile, date('Y-m-d H:i:s') . " - Database connected\n", FILE_APPEND);
-        
+
         // Voorbereid de INSERT query (let op de syntax hier)
         $query = "INSERT INTO transactions (machineId, machineName, firstName, middleName, lastName, badgeCode, products, received_at) 
                  VALUES (:machineId, :machineName, :firstName, :middleName, :lastName, :badgeCode, :products, :received_at)";
-        
+
         $stmt = $db->prepare($query);
-        
+
         if (!$stmt) {
             throw new Exception("Prepare error: " . $db->lastErrorMsg());
         }
-        
+
         // Bind parameters
         $stmt->bindValue(':machineId', $data['machineId'] ?? '', SQLITE3_TEXT);
         $stmt->bindValue(':machineName', $data['machineName'] ?? '', SQLITE3_TEXT);
@@ -41,26 +46,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindValue(':badgeCode', $data['badgeCode'] ?? '', SQLITE3_TEXT);
         $stmt->bindValue(':products', json_encode($data['products'] ?? []), SQLITE3_TEXT);
         $stmt->bindValue(':received_at', date('Y-m-d H:i:s'), SQLITE3_TEXT);
-        
+
         // Voer de query uit
         $result = $stmt->execute();
-        
+
         if (!$result) {
             throw new Exception("Execute error: " . $db->lastErrorMsg());
         }
-        
+
         // Log success
         file_put_contents($logFile, date('Y-m-d H:i:s') . " - Transaction saved successfully\n", FILE_APPEND);
-        
+
         // Stuur succesvolle response
         header('Content-Type: application/json');
         echo json_encode(['status' => 'success']);
         exit;
-        
+
     } catch (Exception $e) {
         // Log de error
         file_put_contents($logFile, date('Y-m-d H:i:s') . " - Error: " . $e->getMessage() . "\n", FILE_APPEND);
-        
+
         // Stuur error response
         header('Content-Type: application/json');
         http_response_code(400);
@@ -71,6 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Voor GET verzoeken, toon de transacties
 try {
+    // Check if SQLite3 extension is available
+    if (!class_exists('SQLite3')) {
+        throw new Exception("SQLite3 extension is not enabled. Please see README.md for instructions on enabling SQLite3.");
+    }
+
     $db = new SQLite3($dbFile);
     $results = $db->query('SELECT * FROM transactions ORDER BY received_at DESC');
     $transactions = [];

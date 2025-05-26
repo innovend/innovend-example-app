@@ -173,6 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
             ?>
         </p>
 
+        <?php if (isset($config['debug']) && $config['debug'] === true): ?>
         <div style="margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;">
             <h3 style="margin-top: 0;">API Request/Response Log</h3>
             <p><strong>API URL:</strong> https://api.vendingweb.eu/api/external/pickupdeliveries/create/false</p>
@@ -180,6 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
             <p><strong>Response Status:</strong> <?= htmlspecialchars($apiHttpStatus ?? 'Unknown') ?></p>
             <p><strong>Response Body:</strong><br><?= htmlspecialchars($apiResponse ?? 'No response data') ?></p>
         </div>
+        <?php endif; ?>
 
         <a href="index.php" class="back-button">Back to main menu</a>
     <?php else: ?>

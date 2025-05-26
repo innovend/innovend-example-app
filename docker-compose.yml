@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    image: php:8.2-apache
+    build: .
     container_name: php-vending-web
     volumes:
       - ./src:/var/www/html
