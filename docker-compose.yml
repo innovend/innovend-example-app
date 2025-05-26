@@ -3,7 +3,7 @@ version: '3.8'
 services:
   web:
     build: .
-    container_name: php-vending-web
+    container_name: innovend-sample-app
     volumes:
       - ./src:/var/www/html
     environment:

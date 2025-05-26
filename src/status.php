@@ -4,9 +4,9 @@ $config = json_decode(file_get_contents('config.json'), true);
 // Voeg deze functie toe voor het annuleren van reserveringen
 function cancelReservation($stockreservationId, $machineId, $deliveryDate) {
     global $config;
-    
+
     $cancelUrl = "https://api.vendingweb.eu/api/external/stockreservations/update/false/true";
-    
+
     $headers = [
         "x-api-key: {$config['apiKey']}",
         "Accept: application/json",
@@ -45,7 +45,7 @@ if (isset($_POST['cancel']) && isset($_POST['reservationId']) && isset($_POST['m
         (int)$_POST['machineId'],
         $_POST['deliveryDate']
     );
-    
+
     if ($success) {
         header("Location: " . $_SERVER['REQUEST_URI']);
         exit;
@@ -301,7 +301,6 @@ function getStatusText($statusId) {
                 </thead>
                 <tbody>
                 <?php foreach ($reservations as $reservation): ?>
-                    <?php foreach ($reservation['Products'] as $product): ?>
                         <tr>
                             <td><?= htmlspecialchars($reservation['MachineId']) ?></td>
                             <td><?= htmlspecialchars(date('Y-m-d H:i', strtotime($reservation['CreatedOn']))) ?></td>
@@ -321,8 +320,20 @@ function getStatusText($statusId) {
                                             <?= getStatusText($reservation['StatusId']) ?>
                                         </span>
                             </td>
-                            <td><?= htmlspecialchars($product['Description']) ?></td>
-                            <td><?= $product['SerialNr'] ? htmlspecialchars($product['SerialNr']) : '-' ?></td>
+                            <td>
+                                <?php 
+                                $productDescriptions = [];
+                                $serialNumbers = [];
+                                foreach ($reservation['Products'] as $product) {
+                                    $productDescriptions[] = htmlspecialchars($product['Description']);
+                                    if ($product['SerialNr']) {
+                                        $serialNumbers[] = htmlspecialchars($product['SerialNr']);
+                                    }
+                                }
+                                echo implode('<br>', $productDescriptions);
+                                ?>
+                            </td>
+                            <td><?= !empty($serialNumbers) ? implode('<br>', $serialNumbers) : '-' ?></td>
                             <td><span class="unlock-code"><?= htmlspecialchars($reservation['UnlockCode']) ?></span></td>
                             <td><?= htmlspecialchars($reservation['FirstName'] ?: '-') ?></td>
                             <td><?= htmlspecialchars($reservation['LastName'] ?: '-') ?></td>
@@ -337,7 +348,6 @@ function getStatusText($statusId) {
                                 <?php endif; ?>
                             </td>
                         </tr>
-                    <?php endforeach; ?>
                 <?php endforeach; ?>
                 </tbody>
             </table>
