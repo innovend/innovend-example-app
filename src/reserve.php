@@ -2,8 +2,20 @@
 $config = json_decode(file_get_contents('config.json'), true);
 
 $machineId = intval($_POST['machineId']);
-$products = $_POST['products'] ?? [];
+$quantities = $_POST['quantity'] ?? [];
 $orderNr = $_POST['ticket'] ?? 'UNKNOWN';
+
+// Convert quantities to individual product entries
+$products = [];
+foreach ($quantities as $sku => $qty) {
+    $qty = intval($qty);
+    if ($qty > 0) {
+        // Add the product to the array multiple times based on quantity
+        for ($i = 0; $i < $qty; $i++) {
+            $products[] = $sku;
+        }
+    }
+}
 
 // timestamps
 $now = (new DateTime())->format('c');

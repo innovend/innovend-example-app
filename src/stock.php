@@ -37,10 +37,28 @@ if ($httpStatus === 200) {
 <head>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Handle image errors
             document.querySelectorAll("img").forEach(img => {
                 img.onerror = () => {
                     img.src = "fallback.png";
                 };
+            });
+
+            // Make product cards clickable to increase quantity
+            document.querySelectorAll(".product-card").forEach(card => {
+                card.addEventListener("click", function(e) {
+                    // Don't increment if clicking directly on the input field
+                    if (e.target.tagName !== 'INPUT') {
+                        const input = this.querySelector('input[type="number"]');
+                        const max = parseInt(input.getAttribute('max'), 10);
+                        const currentValue = parseInt(input.value, 10);
+
+                        // Increment if not at max
+                        if (currentValue < max) {
+                            input.value = currentValue + 1;
+                        }
+                    }
+                });
             });
         });
     </script>
@@ -66,6 +84,14 @@ if ($httpStatus === 200) {
             text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #007bff;
         }
         .product-card img {
             max-width: 100%;
@@ -91,6 +117,7 @@ if ($httpStatus === 200) {
 <form id="reserveForm" method="POST" action="reserve.php">
     <input type="hidden" name="machineId" value="<?= $machineId ?>">
     <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticket) ?>">
+    <button type="submit" form="reserveForm" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px;">Reserve Selected Items</button>
 </form>
 
 <?php foreach ($products as $product):
@@ -105,14 +132,10 @@ if ($httpStatus === 200) {
         <h3><?= htmlspecialchars($name) ?></h3>
         <p>Available: <?= $available ?></p>
         <label>
-            <input type="checkbox" name="products[]" value="<?= htmlspecialchars($sku) ?>" form="reserveForm">
-            Select
+            Quantity: <input type="number" name="quantity[<?= htmlspecialchars($sku) ?>]" value="0" min="0" max="<?= $available ?>" form="reserveForm" style="width: 60px;">
         </label>
     </div>
 <?php endforeach; ?>
 
-<div style="text-align: center; margin-top: 20px;">
-    <button type="submit" form="reserveForm" style="padding: 10px 20px; font-size: 16px;">Reserve Selected Items</button>
-</div>
 </body>
 </html>
