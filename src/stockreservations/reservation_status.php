@@ -338,7 +338,7 @@ function getStatusText($statusId) {
                                 ?>
                             </td>
                             <td><?= !empty($serialNumbers) ? implode('<br>', $serialNumbers) : '-' ?></td>
-                            <td><span class="unlock-code"><?= htmlspecialchars($reservation['UnlockCode']) ?></span></td>
+                            <td><span class="unlock-code"><?= htmlspecialchars($reservation['UnlockCode'] ?: '-') ?></span></td>
                             <td><?= htmlspecialchars($reservation['OrderNr'] ?: '-') ?></td>
                             <td><?= htmlspecialchars($reservation['FirstName'] ?: '-') ?></td>
                             <td><?= htmlspecialchars($reservation['LastName'] ?: '-') ?></td>
