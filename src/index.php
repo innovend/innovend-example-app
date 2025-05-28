@@ -90,6 +90,7 @@
 
         <div class="button-group">
             <h2>Cick & Collect (pickup deliveries)</h2>
+            <a href="pickupdeliveries/pickupdeliveries_start.php" class="button">Create click & collect order</a>
             <a href="pickupdeliveries/pickupdelivieries_return.php" class="button">Create return to locker code</a>
         </div>
 
