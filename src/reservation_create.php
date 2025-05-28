@@ -34,7 +34,7 @@ function createReservation($config, $machineId, $orderNr, $products, $now, $expi
     $productEntries = [];
     foreach ($products as $sku) {
         $productEntries[] = [
-            "SkuCode" => $sku,
+            "SkuCode" => (string)$sku, // Ensure SKU is always a string
             "Qty" => 1
         ];
     }
@@ -138,7 +138,7 @@ if (empty($products)) {
     <div class='message error'>
         <h1>No products selected</h1>
         <p>Please select at least one product to reserve.</p>
-        <form action='stock.php' method='get'>
+        <form action='reservation_stock.php' method='get'>
             <input type='hidden' name='vendingmachine' value='$machineId'>
             <input type='hidden' name='ticket' value='$orderNr'>
             <button type='submit'>Go Back</button>

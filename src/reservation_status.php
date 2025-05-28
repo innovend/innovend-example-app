@@ -266,7 +266,7 @@ function getStatusText($statusId) {
 <div class="container">
     <div class="controls">
         <a href="index.php" class="back-button">Back to main menu</a>
-        <form id="machineForm" method="GET" action="status.php">
+        <form id="machineForm" method="GET" action="reservation_status.php">
             <select name="vendingmachine" onchange="submitForm()">
                 <option value="">Select a location</option>
                 <?php foreach ($machines as $machine): ?>
@@ -294,6 +294,7 @@ function getStatusText($statusId) {
                     <th>Description</th>
                     <th>Serial Number</th>
                     <th>Unlock Code</th>
+                    <th>OrderNr</th>
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Acties</th>
@@ -335,6 +336,7 @@ function getStatusText($statusId) {
                             </td>
                             <td><?= !empty($serialNumbers) ? implode('<br>', $serialNumbers) : '-' ?></td>
                             <td><span class="unlock-code"><?= htmlspecialchars($reservation['UnlockCode']) ?></span></td>
+                            <td><?= htmlspecialchars($reservation['OrderNr'] ?: '-') ?></td>
                             <td><?= htmlspecialchars($reservation['FirstName'] ?: '-') ?></td>
                             <td><?= htmlspecialchars($reservation['LastName'] ?: '-') ?></td>
                             <td>

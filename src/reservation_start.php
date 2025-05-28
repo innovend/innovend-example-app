@@ -1,6 +1,6 @@
 <?php
 // Genereer ticketnummer bij iedere pagina-refresh
-$ticketNumber = "INC" . rand(100000, 999999);
+$orderNumber = "INC" . rand(100000, 999999);
 
 // Haal machinegegevens op
 $config = json_decode(file_get_contents('config.json'), true);
@@ -26,6 +26,14 @@ if ($httpStatus === 200) {
     $machines = json_decode($response, true);
     usort($machines, fn($a, $b) => $a['Id'] <=> $b['Id']);
 }
+
+// Store API call information for debug console
+$apiDebugInfo = [
+    'url' => $url,
+    'headers' => $headers,
+    'status' => $httpStatus,
+    'response' => $response
+];
 ?>
 
 <!DOCTYPE html>
@@ -92,11 +100,11 @@ if ($httpStatus === 200) {
 </head>
 <body>
 <div class="container">
-    <div class="ticket">Ticket number: <?= htmlspecialchars($ticketNumber) ?></div>
+    <div class="ticket">Order number: <?= htmlspecialchars($orderNumber) ?></div>
     <p>An employee made a request for an asset in your ITSM application. The request is approved. First select the
         desired IT vending machine location from the dropdown.</p>
-    <form id="machineForm" method="GET" action="stock.php">
-        <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticketNumber) ?>">
+    <form id="machineForm" method="GET" action="reservation_stock.php">
+        <input type="hidden" name="ticket" value="<?= htmlspecialchars($orderNumber) ?>">
         <label for="vendingmachine">Select a location:</label>
         <select name="vendingmachine" id="vendingmachine" onchange="submitFormIfValid(this)">
             <option value="">IT Vending Machine location</option>
@@ -108,5 +116,19 @@ if ($httpStatus === 200) {
         </select>
     </form>
 </div>
+
+<?php if (isset($config['debug']) && $config['debug'] === true): ?>
+<div style="margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; position: fixed; bottom: 20px; right: 20px; max-width: 80%; max-height: 80%; overflow: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <h3 style="margin-top: 0;">API Request/Response Log</h3>
+    <p><strong>API URL:</strong> <?= htmlspecialchars($apiDebugInfo['url']) ?></p>
+    <p><strong>Request Headers:</strong><br>
+    <?php foreach ($apiDebugInfo['headers'] as $header): ?>
+        <?= htmlspecialchars($header) ?><br>
+    <?php endforeach; ?>
+    </p>
+    <p><strong>Response Status:</strong> <?= htmlspecialchars($apiDebugInfo['status']) ?></p>
+    <p><strong>Response Body:</strong><br><?= htmlspecialchars($apiDebugInfo['response']) ?></p>
+</div>
+<?php endif; ?>
 </body>
 </html>

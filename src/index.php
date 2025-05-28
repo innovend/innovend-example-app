@@ -19,6 +19,7 @@
             background: #fff;
             padding: 30px 40px;
             border-radius: 10px;
+            border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             text-align: center;
             width: 400px;
@@ -54,12 +55,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>ITSM Demo application</h1>
-        <p>This demo application demonstrates how flows can be implemented in your ITSM system.</p>
-        <a href="start.php" class="button">Start asset reservation</a>
-        <a href="status.php" class="button">Asset reservation overview</a>
+        <h1>Innovend Example App</h1>
+        <p>This application contains examples on how our API's can be implemented and used.</p>
+        <a href="reservation_start.php" class="button">Start product reservation</a>
+        <a href="reservation_status.php" class="button">Reservation overview</a>
         <a href="ondemand.php" class="button">Show On Demand Asset Usage</a>
         <a href="return.php" class="button">Create return to locker code</a>
+        <a href="config_editor.php" class="button" style="background-color: #6c757d;">Edit Configuration</a>
     </div>
 </body>
 </html>

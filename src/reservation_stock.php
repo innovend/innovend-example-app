@@ -2,7 +2,7 @@
 $config = json_decode(file_get_contents('config.json'), true);
 
 $machineId = intval($_GET['vendingmachine']);
-$ticket = $_GET['ticket'] ?? 'UNKNOWN';
+$orderNr = $_GET['ticket'] ?? 'UNKNOWN';
 
 $url = "https://api.vendingweb.eu/api/external/machines/stock/{$machineId}";
 $headers = [
@@ -29,6 +29,14 @@ if ($httpStatus === 200) {
         return isset($product['ProductId']) && $product['ProductId'] !== 0;
     });
 }
+
+// Store API call information for debug console
+$apiDebugInfo = [
+    'url' => $url,
+    'headers' => $headers,
+    'status' => $httpStatus,
+    'response' => $response
+];
 
 ?>
 
@@ -113,10 +121,13 @@ if ($httpStatus === 200) {
     </style>
 </head>
 <body>
-<h1>Ticket: <?= htmlspecialchars($ticket) ?></h1>
-<form id="reserveForm" method="POST" action="reserve.php">
+<h1>OrderNr: <?= htmlspecialchars($orderNr) ?></h1>
+<a href="index.php" style="text-decoration: none; display: inline-block; margin-right: 10px;">
+    <button type="button" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px;">Home</button>
+</a>
+<form id="reserveForm" method="POST" action="reservation_create.php" style="display: inline-block;">
     <input type="hidden" name="machineId" value="<?= $machineId ?>">
-    <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticket) ?>">
+    <input type="hidden" name="ticket" value="<?= htmlspecialchars($orderNr) ?>">
     <button type="submit" form="reserveForm" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px;">Reserve Selected Items</button>
 </form>
 
@@ -137,5 +148,18 @@ if ($httpStatus === 200) {
     </div>
 <?php endforeach; ?>
 
+<?php if (isset($config['debug']) && $config['debug'] === true): ?>
+<div style="margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; position: fixed; bottom: 20px; right: 20px; max-width: 80%; max-height: 80%; overflow: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <h3 style="margin-top: 0;">API Request/Response Log</h3>
+    <p><strong>API URL:</strong> <?= htmlspecialchars($apiDebugInfo['url']) ?></p>
+    <p><strong>Request Headers:</strong><br>
+    <?php foreach ($apiDebugInfo['headers'] as $header): ?>
+        <?= htmlspecialchars($header) ?><br>
+    <?php endforeach; ?>
+    </p>
+    <p><strong>Response Status:</strong> <?= htmlspecialchars($apiDebugInfo['status']) ?></p>
+    <p><strong>Response Body:</strong><br><?= htmlspecialchars($apiDebugInfo['response']) ?></p>
+</div>
+<?php endif; ?>
 </body>
 </html>
