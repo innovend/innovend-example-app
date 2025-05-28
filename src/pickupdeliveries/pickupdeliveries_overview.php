@@ -1,14 +1,56 @@
 <?php
 $config = json_decode(file_get_contents('../conf/config.json'), true);
 
+// Get machine data
+$apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
+$machines = [];
+$selectedMachine = '';
+$selectedMachineName = '';
+
+// Check if a machine is selected
+if (isset($_POST['vendingmachine']) && !empty($_POST['vendingmachine'])) {
+    $selectedMachine = $_POST['vendingmachine'];
+}
+
+// Get list of machines
+$machinesUrl = "{$apiBaseUrl}/api/external/machines";
+$headers = [
+    "x-api-key: {$config['apiKey']}",
+    "Accept: application/json"
+];
+
+$curl = curl_init($machinesUrl);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($curl, CURLOPT_USERPWD, $config['username'] . ":" . $config['password']);
+curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+
+$response = curl_exec($curl);
+$httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+curl_close($curl);
+
+if ($httpStatus === 200) {
+    $machines = json_decode($response, true);
+    usort($machines, fn($a, $b) => $a['Id'] <=> $b['Id']);
+
+    // Find the name of the selected machine
+    if ($selectedMachine !== '') {
+        foreach ($machines as $machine) {
+            if ($machine['Id'] == $selectedMachine) {
+                $selectedMachineName = $machine['Name'];
+                break;
+            }
+        }
+    }
+}
+
 // Get pickup deliveries data
 $pickupDeliveries = [];
-$clientId = $config['clientId'] ?? '';
+$clientId = $selectedMachine; // Use selected machine ID as client ID
 
 if ($clientId !== '') {
-    $apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
     $pickupDeliveriesUrl = "{$apiBaseUrl}/api/external/pickupdeliveries/{$clientId}?daysBackDeliveries=30";
-    
+
     $headers = [
         "x-api-key: {$config['apiKey']}",
         "Accept: application/json",
@@ -30,7 +72,9 @@ if ($clientId !== '') {
 
         // Sort pickup deliveries by CreatedOn in descending order
         usort($pickupDeliveries, function($a, $b) {
-            return strtotime($b['CreatedOn']) - strtotime($a['CreatedOn']);
+            $timeA = isset($a['CreatedOn']) && $a['CreatedOn'] !== null ? strtotime($a['CreatedOn']) : 0;
+            $timeB = isset($b['CreatedOn']) && $b['CreatedOn'] !== null ? strtotime($b['CreatedOn']) : 0;
+            return $timeB - $timeA;
         });
     }
 }
@@ -269,7 +313,33 @@ function getStatusText($statusId) {
     </div>
 
     <h1>Click & Collect Overview</h1>
-    <?php if (!empty($pickupDeliveries)): ?>
+
+    <?php if ($selectedMachine === ''): ?>
+        <!-- Machine selection screen -->
+        <p>Please select a machine location to view Click & Collect orders:</p>
+        <form method="POST" action="">
+            <div style="margin: 20px 0; max-width: 400px;">
+                <label for="vendingmachine" style="display: block; margin-bottom: 10px; font-weight: bold;">Select a location:</label>
+                <select name="vendingmachine" id="vendingmachine" required style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">IT Vending Machine location</option>
+                    <?php foreach ($machines as $machine): ?>
+                        <option value="<?= htmlspecialchars($machine['Id']) ?>">
+                            <?= htmlspecialchars($machine['Id']) ?> - <?= htmlspecialchars($machine['Name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="submit" style="background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 12px 20px; font-size: 16px; cursor: pointer; width: 100%;">View Orders</button>
+            </div>
+        </form>
+    <?php elseif (!empty($pickupDeliveries)): ?>
+        <!-- Display selected machine name -->
+        <div style="margin-bottom: 20px; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
+            <strong>Selected Location:</strong> <?= htmlspecialchars($selectedMachine . ' - ' . $selectedMachineName) ?>
+            <form method="POST" action="" style="display: inline-block; margin-left: 20px;">
+                <button type="submit" style="background-color: #6c757d; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 14px;">Change Location</button>
+            </form>
+        </div>
+
         <table>
             <thead>
             <tr>
@@ -322,7 +392,14 @@ function getStatusText($statusId) {
             </tbody>
         </table>
     <?php else: ?>
-        <div class="no-data">No Click & Collect orders found.</div>
+        <!-- Display selected machine name with no orders -->
+        <div style="margin-bottom: 20px; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
+            <strong>Selected Location:</strong> <?= htmlspecialchars($selectedMachine . ' - ' . $selectedMachineName) ?>
+            <form method="POST" action="" style="display: inline-block; margin-left: 20px;">
+                <button type="submit" style="background-color: #6c757d; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 14px;">Change Location</button>
+            </form>
+        </div>
+        <div class="no-data">No Click & Collect orders found for this location.</div>
     <?php endif; ?>
 </div>
 </body>
