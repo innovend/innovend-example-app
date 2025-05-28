@@ -90,8 +90,18 @@ if (isset($_POST['create_order'])) {
         $isPaid = isset($_POST['isPaid']) ? true : false;
         $requireAuthorization = isset($_POST['requireAuthorization']) ? true : false;
 
-        // Format delivery date if provided
-        $deliveryDate = !empty($_POST['deliveryDate']) ? $_POST['deliveryDate'] : null;
+        // Format delivery date if provided (convert from yyyy-mm-dd to yyyyMMdd)
+        $deliveryDate = null;
+        if (!empty($_POST['deliveryDate'])) {
+            try {
+                // Convert from HTML date input format (yyyy-mm-dd) to required API format (yyyyMMdd)
+                $date = new DateTime($_POST['deliveryDate']);
+                $deliveryDate = $date->format('Ymd');
+            } catch (Exception $e) {
+                // If date parsing fails, add an error
+                $formErrors['deliveryDate'] = "Invalid date format. Please use the date picker.";
+            }
+        }
 
         $payload = json_encode([
             "MachineId" => $selectedMachine,
@@ -415,6 +425,9 @@ if (isset($_POST['create_order'])) {
                     <div class="form-group">
                         <label for="deliveryDate">Delivery Date</label>
                         <input type="date" id="deliveryDate" name="deliveryDate" value="<?= htmlspecialchars($_POST['deliveryDate'] ?? '') ?>">
+                        <?php if (isset($formErrors['deliveryDate'])): ?>
+                            <div class="error-message"><?= htmlspecialchars($formErrors['deliveryDate']) ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="form-col">
