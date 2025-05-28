@@ -12,8 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $apiUrls = [
         'Production' => 'https://api.vendingweb.eu',
         'Staging' => 'https://staging-api.vendingweb.eu',
-        'Test' => 'https://test.vendingweb.eu',
-        'Development' => 'https://dev.vendingweb.eu',
+        'Test' => 'https://test-api.vendingweb.eu',
+        'Development' => 'https://dev-api.vendingweb.eu',
         'Local' => 'http://localhost:7280'
     ];
 
