@@ -1,5 +1,5 @@
 <?php
-$config = json_decode(file_get_contents('config.json'), true);
+$config = json_decode(file_get_contents('../conf/config.json'), true);
 
 $machineId = intval($_GET['vendingmachine']);
 $orderNr = $_GET['ticket'] ?? 'UNKNOWN';
@@ -123,7 +123,7 @@ $apiDebugInfo = [
 </head>
 <body>
 <h1>OrderNr: <?= htmlspecialchars($orderNr) ?></h1>
-<a href="index.php" style="text-decoration: none; display: inline-block; margin-right: 10px;">
+<a href="../index.php" style="text-decoration: none; display: inline-block; margin-right: 10px;">
     <button type="button" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px;">Home</button>
 </a>
 <form id="reserveForm" method="POST" action="reservation_create.php" style="display: inline-block;">

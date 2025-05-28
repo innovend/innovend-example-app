@@ -1,5 +1,5 @@
 <?php
-$config = json_decode(file_get_contents('config.json'), true);
+$config = json_decode(file_get_contents('../conf/config.json'), true);
 
 $productId = isset($_GET['product']) ? intval($_GET['product']) : 0;
 if (!$productId) {

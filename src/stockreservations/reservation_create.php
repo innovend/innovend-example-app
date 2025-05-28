@@ -1,5 +1,5 @@
 <?php
-$config = json_decode(file_get_contents('config.json'), true);
+$config = json_decode(file_get_contents('../conf/config.json'), true);
 
 $machineId = intval($_POST['machineId']);
 $quantities = $_POST['quantity'] ?? [];
@@ -200,7 +200,7 @@ for ($i = 0; $i < $maxAttempts; $i++) {
         }
 
         echo "
-            <form action='index.php' method='get'>
+            <form action='../index.php' method='get'>
                 <button type='submit'>Return Home</button>
             </form>
         </div>";
@@ -252,7 +252,7 @@ if (isset($config['debug']) && $config['debug'] === true) {
 }
 
 echo "
-        <form action='index.php' method='get'>
+        <form action='../index.php' method='get'>
             <button type='submit'>Return Home</button>
         </form>
     </div>";

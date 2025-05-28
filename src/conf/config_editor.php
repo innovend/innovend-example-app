@@ -43,9 +43,9 @@ If running directly on Windows:
 - Grant Write permission
 
 If running in Docker:
-- On Windows host: chmod 666 src/config.json (using Git Bash or WSL)
-- On Linux/Mac host: chmod 666 src/config.json
-- Or make the file owned by the www-data user: chown www-data:www-data src/config.json';
+- On Windows host: chmod 666 src/conf/config.json (using Git Bash or WSL)
+- On Linux/Mac host: chmod 666 src/conf/config.json
+- Or make the file owned by the www-data user: chown www-data:www-data src/conf/config.json';
         $result = false;
     } else {
         $result = file_put_contents('config.json', $jsonConfig);
@@ -231,7 +231,7 @@ $config = json_decode(file_get_contents('config.json'), true);
             </div>
 
             <button type="submit" class="button">Save Configuration</button>
-            <a href="index.php" class="button secondary">Back to Home</a>
+            <a href="../index.php" class="button secondary">Back to Home</a>
         </form>
     </div>
 </body>

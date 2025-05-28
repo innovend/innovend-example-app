@@ -1,5 +1,5 @@
 <?php
-$config = json_decode(file_get_contents('config.json'), true);
+$config = json_decode(file_get_contents('../conf/config.json'), true);
 
 // Voeg deze functie toe voor het annuleren van reserveringen
 function cancelReservation($stockreservationId, $machineId, $deliveryDate) {
@@ -268,7 +268,7 @@ function getStatusText($statusId) {
 <body>
 <div class="container">
     <div class="controls">
-        <a href="index.php" class="back-button">Back to main menu</a>
+        <a href="../index.php" class="back-button">Back to main menu</a>
         <form id="machineForm" method="GET" action="reservation_status.php">
             <select name="vendingmachine" onchange="submitForm()">
                 <option value="">Select a location</option>

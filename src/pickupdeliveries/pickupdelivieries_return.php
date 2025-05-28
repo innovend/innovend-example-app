@@ -6,7 +6,7 @@ $returnCode = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
 $ticketNumber = isset($_GET['ticket']) ? $_GET['ticket'] : "INC" . rand(100000, 999999);
 
 // Load configuration
-$config = json_decode(file_get_contents('config.json'), true);
+$config = json_decode(file_get_contents('../conf/config.json'), true);
 
 // Get machine data if needed
 $apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
@@ -212,7 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
         </script>
         <?php endif; ?>
 
-        <a href="index.php" class="back-button">Back to main menu</a>
+        <a href="../index.php" class="back-button">Back to main menu</a>
     <?php else: ?>
         <p>Generate a return code to return your asset to an IT vending machine locker. First select the desired IT vending machine location.</p>
         <form method="POST" action="">
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
             </select>
             <button type="submit">Generate Return Code</button>
         </form>
-        <a href="index.php" class="back-button">Back to main menu</a>
+        <a href="../index.php" class="back-button">Back to main menu</a>
     <?php endif; ?>
 </div>
 </body>

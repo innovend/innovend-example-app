@@ -3,7 +3,7 @@
 $orderNumber = "INC" . rand(100000, 999999);
 
 // Haal machinegegevens op
-$config = json_decode(file_get_contents('config.json'), true);
+$config = json_decode(file_get_contents('../conf/config.json'), true);
 $apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
 $url = "{$apiBaseUrl}/api/external/machines";
 $headers = [
