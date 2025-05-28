@@ -468,7 +468,7 @@ if (isset($_POST['create_order'])) {
             <div class="form-group">
                 <label for="returnUrl">Return URL</label>
                 <input type="text" id="returnUrl" name="returnUrl" value="<?= htmlspecialchars($_POST['returnUrl'] ?? '') ?>">
-                <small>WHen added, we will send a webhook when the order is filled and when it is collected with the status.</small>
+                <small>When added, we will send a webhook when the order is filled and when it is collected with the status.</small>
             </div>
 
             <div class="form-row">
