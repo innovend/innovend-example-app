@@ -27,6 +27,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db = new SQLite3($dbFile);
         file_put_contents($logFile, date('Y-m-d H:i:s') . " - Database connected\n", FILE_APPEND);
 
+        // Check if transactions table exists, if not create it
+        $tableCheck = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='transactions'");
+        if (!$tableCheck->fetchArray()) {
+            // Create the transactions table
+            $createTableQuery = "CREATE TABLE IF NOT EXISTS transactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                machineId TEXT NOT NULL,
+                machineName TEXT NOT NULL,
+                firstName TEXT NOT NULL,
+                middleName TEXT,
+                lastName TEXT NOT NULL,
+                badgeCode TEXT NOT NULL,
+                products TEXT NOT NULL,
+                received_at DATETIME NOT NULL
+            )";
+            $db->exec($createTableQuery);
+            file_put_contents($logFile, date('Y-m-d H:i:s') . " - Created transactions table\n", FILE_APPEND);
+        }
+
         // Voorbereid de INSERT query (let op de syntax hier)
         $query = "INSERT INTO transactions (machineId, machineName, firstName, middleName, lastName, badgeCode, products, received_at) 
                  VALUES (:machineId, :machineName, :firstName, :middleName, :lastName, :badgeCode, :products, :received_at)";
@@ -82,6 +101,25 @@ try {
     }
 
     $db = new SQLite3($dbFile);
+
+    // Check if transactions table exists, if not create it
+    $tableCheck = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='transactions'");
+    if (!$tableCheck->fetchArray()) {
+        // Create the transactions table
+        $createTableQuery = "CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            machineId TEXT NOT NULL,
+            machineName TEXT NOT NULL,
+            firstName TEXT NOT NULL,
+            middleName TEXT,
+            lastName TEXT NOT NULL,
+            badgeCode TEXT NOT NULL,
+            products TEXT NOT NULL,
+            received_at DATETIME NOT NULL
+        )";
+        $db->exec($createTableQuery);
+    }
+
     $results = $db->query('SELECT * FROM transactions ORDER BY received_at DESC');
     $transactions = [];
 

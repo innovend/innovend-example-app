@@ -89,9 +89,13 @@
         </div>
 
         <div class="button-group">
-            <h2>Asset Management</h2>
-            <a href="ondemand.php" class="button">Show On Demand Asset Usage</a>
+            <h2>Cick & Collect (pickup deliveries)</h2>
             <a href="pickupdeliveries/pickupdelivieries_return.php" class="button">Create return to locker code</a>
+        </div>
+
+        <div class="button-group">
+            <h2>Webhook receivers</h2>
+            <a href="ondemand.php" class="button">Show received webhook sales data</a>
         </div>
 
         <div class="button-group">

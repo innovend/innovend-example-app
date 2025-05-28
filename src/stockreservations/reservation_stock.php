@@ -29,6 +29,18 @@ if ($httpStatus === 200) {
     $products = array_filter($products, function($product) {
         return isset($product['ProductId']) && $product['ProductId'] !== 0;
     });
+
+    // Sort products - items with stock first, then items without stock
+    usort($products, function($a, $b) {
+        $aHasStock = ($a['AvailableCountExReservations'] > 0);
+        $bHasStock = ($b['AvailableCountExReservations'] > 0);
+
+        if ($aHasStock === $bHasStock) {
+            return 0; // Keep original order if both have stock or both don't have stock
+        }
+
+        return $aHasStock ? -1 : 1; // Items with stock come first
+    });
 }
 
 // Store API call information for debug console
@@ -53,8 +65,8 @@ $apiDebugInfo = [
                 };
             });
 
-            // Make product cards clickable to increase quantity
-            document.querySelectorAll(".product-card").forEach(card => {
+            // Make product cards clickable to increase quantity (only for products with stock)
+            document.querySelectorAll(".product-card:not(.no-stock)").forEach(card => {
                 card.addEventListener("click", function(e) {
                     // Don't increment if clicking directly on the input field
                     if (e.target.tagName !== 'INPUT') {
@@ -102,6 +114,26 @@ $apiDebugInfo = [
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-color: #007bff;
         }
+        .product-card.no-stock {
+            background-color: #f0f0f0;
+            cursor: default;
+            opacity: 0.8;
+        }
+        .product-card.no-stock:hover {
+            transform: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-color: #ddd;
+        }
+        .no-stock-label {
+            background-color: #dc3545;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
         .product-card img {
             max-width: 100%;
             height: 120px;
@@ -132,20 +164,29 @@ $apiDebugInfo = [
     <button type="submit" form="reserveForm" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px;">Reserve Selected Items</button>
 </form>
 
+<div style="clear: both; width: 100%;"></div>
+
 <?php foreach ($products as $product):
     $available = $product['AvailableCountExReservations'];
     $name = $product['ProductName'] ?? 'Unnamed';
     $sku = $product['ProductSKU'] ?? '';
     $productId = $product['ProductId'];
     $imageUrl = "image.php?product={$productId}";
+    $hasStock = ($available > 0);
     ?>
-    <div class="product-card">
+    <div class="product-card <?= $hasStock ? '' : 'no-stock' ?>">
         <img src="<?= $imageUrl ?>" alt="<?= htmlspecialchars($name) ?>">
         <h3><?= htmlspecialchars($name) ?></h3>
-        <p>Available: <?= $available ?></p>
-        <label>
-            Quantity: <input type="number" name="quantity[<?= htmlspecialchars($sku) ?>]" value="0" min="0" max="<?= $available ?>" form="reserveForm" style="width: 60px;">
-        </label>
+        <?php if ($hasStock): ?>
+            <p>Available: <?= $available ?></p>
+            <label>
+                Quantity: <input type="number" name="quantity[<?= htmlspecialchars($sku) ?>]" value="0" min="0" max="<?= $available ?>" form="reserveForm" style="width: 60px;">
+            </label>
+        <?php else: ?>
+            <p>Available: 0</p>
+            <div class="no-stock-label">No Stock</div>
+            <input type="hidden" name="quantity[<?= htmlspecialchars($sku) ?>]" value="0" form="reserveForm">
+        <?php endif; ?>
     </div>
 <?php endforeach; ?>
 

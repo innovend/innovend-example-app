@@ -102,8 +102,9 @@ $apiDebugInfo = [
 <body>
 <div class="container">
     <div class="ticket">Order number: <?= htmlspecialchars($orderNumber) ?></div>
-    <p>An employee made a request for an asset in your ITSM application. The request is approved. First select the
+    <p>EXAMPLE 1: An employee made a request for an asset in your ITSM application. The request is approved. First select the
         desired IT vending machine location from the dropdown.</p>
+    <p>EXAMPLE 2: You want to enable your webshop users to reserve products and collecting them at the vending machine to make sure they will have stock.</p>
     <form id="machineForm" method="GET" action="reservation_stock.php">
         <input type="hidden" name="ticket" value="<?= htmlspecialchars($orderNumber) ?>">
         <label for="vendingmachine">Select a location:</label>
