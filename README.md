@@ -1,8 +1,8 @@
-# Snow Mock Server
+# Innovend Example App
 
 ## Overview
 
-Snow Mock Server is a demonstration application that simulates an IT Service Management (ITSM) system integration with vending machines for asset management. It provides examples of how to implement and use APIs for product reservations, returns, and other asset management functions.
+The Innovend Example App is a demonstration application to help developers getting started using our API's.
 
 The application serves as a mock server to demonstrate various workflows:
 - Product reservation process
