@@ -84,11 +84,13 @@ if (isset($_POST['create_order'])) {
         $apiUrl = "{$apiBaseUrl}/api/external/pickupdeliveries/create/true";
 
         // Get checkbox values (convert to boolean)
-        $doSendEmail = isset($_POST['doSendEmail']) ? true : false;
         $doSendEmailAfterCreate = isset($_POST['doSendEmailAfterCreate']) ? true : false;
         $doSendEmailAfterFill = isset($_POST['doSendEmailAfterFill']) ? true : false;
         $isPaid = isset($_POST['isPaid']) ? true : false;
         $requireAuthorization = isset($_POST['requireAuthorization']) ? true : false;
+
+        // Set doSendEmail to true if email options are enabled
+        $doSendEmail = $doSendEmailAfterCreate || $doSendEmailAfterFill;
 
         // Format delivery date if provided (convert from yyyy-mm-dd to yyyyMMdd)
         $deliveryDate = null;
@@ -114,8 +116,8 @@ if (isset($_POST['create_order'])) {
             "DeliveryDate" => $deliveryDate,
             "DeliveryTime" => $_POST['deliveryTime'] ?? '',
             "UnlockCode" => $pickupCode,
-            "Price" => !empty($_POST['price']) ? (float)$_POST['price'] : 0,
-            "PriceExclVat" => !empty($_POST['priceExclVat']) ? (float)$_POST['priceExclVat'] : 0,
+            "Price" => !empty($_POST['price']) ? (int)((float)$_POST['price'] * 100) : 0,
+            "PriceExclVat" => !empty($_POST['priceExclVat']) ? (int)((float)$_POST['priceExclVat'] * 100) : 0,
             "PriceVatPercentage" => !empty($_POST['priceVatPercentage']) ? (float)$_POST['priceVatPercentage'] : 0,
             "ReturnUrl" => $_POST['returnUrl'] ?? '',
             "DoSendEmailAfterCreate" => $doSendEmailAfterCreate,
@@ -405,13 +407,6 @@ if (isset($_POST['create_order'])) {
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email Address *</label>
-                <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
-                <?php if (isset($formErrors['email'])): ?>
-                    <div class="error-message"><?= htmlspecialchars($formErrors['email']) ?></div>
-                <?php endif; ?>
-            </div>
 
             <div class="form-group">
                 <label for="description">Description</label>
@@ -424,7 +419,7 @@ if (isset($_POST['create_order'])) {
                 <div class="form-col">
                     <div class="form-group">
                         <label for="deliveryDate">Delivery Date</label>
-                        <input type="date" id="deliveryDate" name="deliveryDate" value="<?= htmlspecialchars($_POST['deliveryDate'] ?? '') ?>">
+                        <input type="date" id="deliveryDate" name="deliveryDate" value="<?= htmlspecialchars($_POST['deliveryDate'] ?? date('Y-m-d')) ?>">
                         <?php if (isset($formErrors['deliveryDate'])): ?>
                             <div class="error-message"><?= htmlspecialchars($formErrors['deliveryDate']) ?></div>
                         <?php endif; ?>
@@ -473,45 +468,82 @@ if (isset($_POST['create_order'])) {
             <div class="form-group">
                 <label for="returnUrl">Return URL</label>
                 <input type="text" id="returnUrl" name="returnUrl" value="<?= htmlspecialchars($_POST['returnUrl'] ?? '') ?>">
-                <small>URL to redirect after completion</small>
+                <small>WHen added, we will send a webhook when the order is filled and when it is collected with the status.</small>
             </div>
 
             <div class="form-row">
                 <div class="form-col">
                     <div class="form-group">
                         <label class="checkbox-label">
-                            <input type="checkbox" name="doSendEmail" <?= isset($_POST['doSendEmail']) ? 'checked' : '' ?>>
-                            Send Email to Customer
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="doSendEmailAfterCreate" <?= isset($_POST['doSendEmailAfterCreate']) ? 'checked' : '' ?>>
-                            Send Email After Create
-                        </label>
-                    </div>
-                </div>
-                <div class="form-col">
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="doSendEmailAfterFill" <?= isset($_POST['doSendEmailAfterFill']) ? 'checked' : '' ?>>
-                            Send Email After Fill
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="checkbox-label">
                             <input type="checkbox" name="isPaid" <?= isset($_POST['isPaid']) ? 'checked' : '' ?>>
-                            Mark as Paid
+                            Prepaid?
                         </label>
                     </div>
                     <div class="form-group">
                         <label class="checkbox-label">
                             <input type="checkbox" name="requireAuthorization" <?= isset($_POST['requireAuthorization']) ? 'checked' : '' ?>>
-                            Require Authorization
+                            Require age verification?
                         </label>
                     </div>
                 </div>
             </div>
+
+            <h3 class="section-title">Email Settings</h3>
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="doSendEmailAfterCreate" name="doSendEmailAfterCreate" <?= isset($_POST['doSendEmailAfterCreate']) ? 'checked' : '' ?>>
+                            Send Email After Create
+                        </label>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group" id="sendEmailAfterFillGroup" style="display: none;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="doSendEmailAfterFill" <?= isset($_POST['doSendEmailAfterFill']) ? 'checked' : '' ?>>
+                            Send Email After Fill
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" id="emailAddressGroup" style="display: none;">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
+                <?php if (isset($formErrors['email'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($formErrors['email']) ?></div>
+                <?php endif; ?>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const emailAfterCreateCheckbox = document.getElementById('doSendEmailAfterCreate');
+                    const emailAfterFillGroup = document.getElementById('sendEmailAfterFillGroup');
+                    const emailAddressGroup = document.getElementById('emailAddressGroup');
+                    const emailAfterFillCheckbox = document.querySelector('input[name="doSendEmailAfterFill"]');
+
+                    // Initial state
+                    if (emailAfterCreateCheckbox.checked) {
+                        emailAfterFillGroup.style.display = 'block';
+                        emailAddressGroup.style.display = 'block';
+                        emailAfterFillCheckbox.checked = true;
+                    }
+
+                    // Add event listener
+                    emailAfterCreateCheckbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            emailAfterFillGroup.style.display = 'block';
+                            emailAddressGroup.style.display = 'block';
+                            emailAfterFillCheckbox.checked = true;
+                        } else {
+                            emailAfterFillGroup.style.display = 'none';
+                            emailAddressGroup.style.display = 'none';
+                            emailAfterFillCheckbox.checked = false;
+                        }
+                    });
+                });
+            </script>
 
             <div class="actions">
                 <a href="pickupdeliveries_start.php" class="back-button">Back to Location Selection</a>
