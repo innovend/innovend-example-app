@@ -5,7 +5,8 @@ $config = json_decode(file_get_contents('config.json'), true);
 function cancelReservation($stockreservationId, $machineId, $deliveryDate) {
     global $config;
 
-    $cancelUrl = "https://api.vendingweb.eu/api/external/stockreservations/update/false/true";
+    $apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
+    $cancelUrl = "{$apiBaseUrl}/api/external/stockreservations/update/false/true";
 
     $headers = [
         "x-api-key: {$config['apiKey']}",
@@ -53,7 +54,8 @@ if (isset($_POST['cancel']) && isset($_POST['reservationId']) && isset($_POST['m
 }
 
 // Get machines for dropdown
-$machinesUrl = "https://api.vendingweb.eu/api/external/machines";
+$apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
+$machinesUrl = "{$apiBaseUrl}/api/external/machines";
 $headers = [
     "x-api-key: {$config['apiKey']}",
     "Accept: application/json",
@@ -81,7 +83,8 @@ $reservations = [];
 $selectedMachine = $_GET['vendingmachine'] ?? '';
 
 if ($selectedMachine !== '') {
-    $reservationsUrl = "https://api.vendingweb.eu/api/external/stockreservations/stockreservationproducts";
+    $apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
+    $reservationsUrl = "{$apiBaseUrl}/api/external/stockreservations/stockreservationproducts";
 
     $requestBody = json_encode([
         "MachineId" => (int)$selectedMachine,

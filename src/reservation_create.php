@@ -52,7 +52,8 @@ function createReservation($config, $machineId, $orderNr, $products, $now, $expi
         ]
     ]);
 
-    $url = "https://api.vendingweb.eu/api/external/stockreservations/update/false/true";
+    $apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
+    $url = "{$apiBaseUrl}/api/external/stockreservations/update/true/true";
     $headers = [
         "x-api-key: {$config['apiKey']}",
         "Accept: application/json",

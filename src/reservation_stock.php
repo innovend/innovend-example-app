@@ -4,7 +4,8 @@ $config = json_decode(file_get_contents('config.json'), true);
 $machineId = intval($_GET['vendingmachine']);
 $orderNr = $_GET['ticket'] ?? 'UNKNOWN';
 
-$url = "https://api.vendingweb.eu/api/external/machines/stock/{$machineId}";
+$apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
+$url = "{$apiBaseUrl}/api/external/machines/stock/{$machineId}";
 $headers = [
     "x-api-key: {$config['apiKey']}",
     "Accept: application/json"

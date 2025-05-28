@@ -7,7 +7,8 @@ if (!$productId) {
     exit('Missing product ID');
 }
 
-$url = "https://api.vendingweb.eu/api/external/products/downloadthumbimage/{$productId}";
+$apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
+$url = "{$apiBaseUrl}/api/external/products/downloadthumbimage/{$productId}";
 
 $headers = [
     "Accept: */*"

@@ -6,13 +6,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
     $debug = isset($_POST['debug']) ? true : false;
+    $environment = $_POST['environment'] ?? 'Production';
+
+    // Define API URLs for each environment
+    $apiUrls = [
+        'Production' => 'https://api.vendingweb.eu',
+        'Staging' => 'https://staging-api.vendingweb.eu',
+        'Test' => 'https://test.vendingweb.eu',
+        'Development' => 'https://dev.vendingweb.eu',
+        'Local' => 'http://localhost:7280'
+    ];
+
+    // Get the API URL for the selected environment
+    $apiUrl = $apiUrls[$environment] ?? $apiUrls['Production'];
 
     // Create config array
     $config = [
         'apiKey' => $apiKey,
         'username' => $username,
         'password' => $password,
-        'debug' => $debug
+        'debug' => $debug,
+        'environment' => $environment,
+        'apiUrl' => $apiUrl
     ];
 
     // Convert to JSON and save to file
@@ -181,6 +196,28 @@ $config = json_decode(file_get_contents('config.json'), true);
             <div class="form-group">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" value="<?php echo htmlspecialchars($config['password']); ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="environment">Environment:</label>
+                <select id="environment" name="environment" class="form-control">
+                    <?php
+                    $environments = [
+                        'Production' => 'https://api.vendingweb.eu',
+                        'Staging' => 'https://staging-api.vendingweb.eu',
+                        'Test' => 'https://test.vendingweb.eu',
+                        'Development' => 'https://dev.vendingweb.eu',
+                        'Local' => 'http://localhost:7280'
+                    ];
+
+                    $currentEnv = $config['environment'] ?? 'Production';
+
+                    foreach ($environments as $env => $url) {
+                        $selected = ($currentEnv === $env) ? 'selected' : '';
+                        echo "<option value=\"{$env}\" {$selected}>{$env}</option>";
+                    }
+                    ?>
+                </select>
             </div>
 
             <div class="form-group checkbox-group">
