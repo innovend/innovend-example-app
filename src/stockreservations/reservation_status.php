@@ -180,6 +180,31 @@ function getStatusText($statusId) {
             font-weight: bold;
             position: sticky;
             top: 0;
+            cursor: pointer;
+        }
+
+        th:hover {
+            background-color: #e9ecef;
+        }
+
+        th::after {
+            content: "";
+            float: right;
+            margin-top: 7px;
+            border-width: 4px;
+            border-style: solid;
+            border-color: transparent;
+            visibility: hidden;
+        }
+
+        th.sort-asc::after {
+            border-bottom-color: #333;
+            visibility: visible;
+        }
+
+        th.sort-desc::after {
+            border-top-color: #333;
+            visibility: visible;
         }
 
         tr:hover {
@@ -263,6 +288,84 @@ function getStatusText($statusId) {
         function submitForm() {
             document.getElementById('machineForm').submit();
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.querySelector('table');
+            if (!table) return;
+
+            const headers = table.querySelectorAll('th');
+            const tableBody = table.querySelector('tbody');
+            const rows = tableBody.querySelectorAll('tr');
+
+            // Add click event to all headers
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => {
+                    // Remove sort classes from all headers
+                    headers.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+
+                    // Determine sort direction
+                    const isAscending = !header.classList.contains('sort-asc');
+
+                    // Add appropriate sort class
+                    header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+
+                    // Convert rows to array for sorting
+                    const rowsArray = Array.from(rows);
+
+                    // Sort the rows
+                    rowsArray.sort((rowA, rowB) => {
+                        const cellAElement = rowA.querySelectorAll('td')[index];
+                        const cellBElement = rowB.querySelectorAll('td')[index];
+
+                        // Get text content, handling special cases
+                        let cellA = cellAElement.textContent.trim();
+                        let cellB = cellBElement.textContent.trim();
+
+                        // Special handling for status column (contains span with class)
+                        if (cellAElement.querySelector('.status') && cellBElement.querySelector('.status')) {
+                            cellA = cellAElement.querySelector('.status').textContent.trim();
+                            cellB = cellBElement.querySelector('.status').textContent.trim();
+                        }
+
+                        // Special handling for cells with multiple lines (br tags)
+                        if (cellAElement.innerHTML.includes('<br>') && cellBElement.innerHTML.includes('<br>')) {
+                            // Just use the first line for comparison
+                            cellA = cellAElement.innerHTML.split('<br>')[0].replace(/<[^>]*>/g, '').trim();
+                            cellB = cellBElement.innerHTML.split('<br>')[0].replace(/<[^>]*>/g, '').trim();
+                        }
+
+                        // Handle date comparisons
+                        if (cellA.match(/^\d{4}-\d{2}-\d{2}/) && cellB.match(/^\d{4}-\d{2}-\d{2}/)) {
+                            const dateA = new Date(cellA.replace(/-/g, '/'));
+                            const dateB = new Date(cellB.replace(/-/g, '/'));
+                            return isAscending ? dateA - dateB : dateB - dateA;
+                        }
+
+                        // Handle numeric comparisons
+                        if (!isNaN(cellA) && !isNaN(cellB)) {
+                            return isAscending ? Number(cellA) - Number(cellB) : Number(cellB) - Number(cellA);
+                        }
+
+                        // Default string comparison
+                        return isAscending 
+                            ? cellA.localeCompare(cellB) 
+                            : cellB.localeCompare(cellA);
+                    });
+
+                    // Remove all existing rows
+                    rows.forEach(row => {
+                        tableBody.removeChild(row);
+                    });
+
+                    // Add sorted rows
+                    rowsArray.forEach(row => {
+                        tableBody.appendChild(row);
+                    });
+                });
+            });
+        });
     </script>
 </head>
 <body>
@@ -288,18 +391,18 @@ function getStatusText($statusId) {
             <table>
                 <thead>
                 <tr>
-                    <th>Machine ID</th>
-                    <th>Created On</th>
-                    <th>Delivery Date</th>
-                    <th>Delivered On</th>
-                    <th>Expiration Date</th>
-                    <th>Status</th>
-                    <th>Description</th>
-                    <th>Serial Number</th>
-                    <th>Unlock Code</th>
-                    <th>OrderNr</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
+                    <th>Machine ID ↕</th>
+                    <th>Created On ↕</th>
+                    <th>Delivery Date ↕</th>
+                    <th>Delivered On ↕</th>
+                    <th>Expiration Date ↕</th>
+                    <th>Status ↕</th>
+                    <th>Description ↕</th>
+                    <th>Serial Number ↕</th>
+                    <th>Unlock Code ↕</th>
+                    <th>OrderNr ↕</th>
+                    <th>First Name ↕</th>
+                    <th>Last Name ↕</th>
                     <th>Acties</th>
                 </tr>
                 </thead>
@@ -312,16 +415,26 @@ function getStatusText($statusId) {
                             <td><?= $reservation['DeliveredOn'] ? htmlspecialchars(date('Y-m-d H:i', strtotime($reservation['DeliveredOn']))) : '-' ?></td>
                             <td><?= $reservation['ExpirationDate'] ? htmlspecialchars(date('Y-m-d H:i', strtotime($reservation['ExpirationDate']))) : '-' ?></td>
                             <td>
-                                        <span class="status <?=
-                                        match ($reservation['StatusId']) {
-                                            1 => 'status-ready',
-                                            4 => 'status-expired',
-                                            6 => 'status-collected',
-                                            9 => 'status-cancelled',
-                                            default => 'status-other'
-                                        }
-                                        ?>">
-                                            <?= getStatusText($reservation['StatusId']) ?>
+                                <?php
+                                // Check if the order is expired based on expiration date
+                                $isExpired = false;
+                                if ($reservation['ExpirationDate'] && strtotime($reservation['ExpirationDate']) < time()) {
+                                    $isExpired = true;
+                                }
+
+                                // Use status-expired class and text if expired by date, otherwise use the original status
+                                $statusClass = $isExpired ? 'status-expired' : match ($reservation['StatusId']) {
+                                    1 => 'status-ready',
+                                    4 => 'status-expired',
+                                    6 => 'status-collected',
+                                    9 => 'status-cancelled',
+                                    default => 'status-other'
+                                };
+
+                                $statusText = $isExpired ? 'Expired' : getStatusText($reservation['StatusId']);
+                                ?>
+                                        <span class="status <?= $statusClass ?>">
+                                            <?= $statusText ?>
                                         </span>
                             </td>
                             <td>
