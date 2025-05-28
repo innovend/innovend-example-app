@@ -321,7 +321,7 @@ function getStatusText($statusId) {
             <div style="margin: 20px 0; max-width: 400px;">
                 <label for="vendingmachine" style="display: block; margin-bottom: 10px; font-weight: bold;">Select a location:</label>
                 <select name="vendingmachine" id="vendingmachine" required style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;">
-                    <option value="">IT Vending Machine location</option>
+                    <option value="">Vending Machine location</option>
                     <?php foreach ($machines as $machine): ?>
                         <option value="<?= htmlspecialchars($machine['Id']) ?>">
                             <?= htmlspecialchars($machine['Id']) ?> - <?= htmlspecialchars($machine['Name']) ?>

@@ -214,12 +214,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
 
         <a href="../index.php" class="back-button">Back to main menu</a>
     <?php else: ?>
-        <p>Generate a return code to return your asset to an IT vending machine locker. First select the desired IT vending machine location.</p>
+        <p>Generate a return code to return your asset to an IT vending machine locker. First select the desired vending machine location.</p>
         <form method="POST" action="">
             <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticketNumber) ?>">
             <label for="vendingmachine">Select a location:</label>
             <select name="vendingmachine" id="vendingmachine" required>
-                <option value="">IT Vending Machine location</option>
+                <option value="">Vending Machine location</option>
                 <?php foreach ($machines as $machine): ?>
                     <option value="<?= htmlspecialchars($machine['Id']) ?>">
                         <?= htmlspecialchars($machine['Id']) ?> - <?= htmlspecialchars($machine['Name']) ?>

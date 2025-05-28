@@ -101,12 +101,12 @@ if ($httpStatus === 200) {
     <h2>Create Click & Collect Order</h2>
     <div class="ticket">Ticket number: <?= htmlspecialchars($ticketNumber) ?></div>
     
-    <p>Start a new click & collect order by selecting the desired IT vending machine location.</p>
+    <p>Start a new click & collect order by selecting the desired vending machine location.</p>
     <form method="POST" action="pickupdeliveries_create.php">
         <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticketNumber) ?>">
         <label for="vendingmachine">Select a location:</label>
         <select name="vendingmachine" id="vendingmachine" required>
-            <option value="">IT Vending Machine location</option>
+            <option value="">Vending Machine location</option>
             <?php foreach ($machines as $machine): ?>
                 <option value="<?= htmlspecialchars($machine['Id']) ?>">
                     <?= htmlspecialchars($machine['Id']) ?> - <?= htmlspecialchars($machine['Name']) ?>
