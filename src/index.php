@@ -60,7 +60,7 @@
         <a href="reservation_start.php" class="button">Start product reservation</a>
         <a href="reservation_status.php" class="button">Reservation overview</a>
         <a href="ondemand.php" class="button">Show On Demand Asset Usage</a>
-        <a href="return.php" class="button">Create return to locker code</a>
+        <a href="pickupdelivieries_return.php" class="button">Create return to locker code</a>
         <a href="config_editor.php" class="button" style="background-color: #6c757d;">Edit Configuration</a>
     </div>
 </body>

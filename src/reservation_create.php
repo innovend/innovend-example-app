@@ -164,13 +164,39 @@ for ($i = 0; $i < $maxAttempts; $i++) {
 
         if (isset($config['debug']) && $config['debug'] === true) {
             echo "
-            <div style='margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;'>
-                <h3 style='margin-top: 0;'>API Request/Response Log</h3>
-                <p><strong>API URL:</strong> " . htmlspecialchars($apiUrl) . "</p>
-                <p><strong>Request Payload:</strong><br>" . htmlspecialchars($apiPayload ?? 'No payload data') . "</p>
-                <p><strong>Response Status:</strong> " . htmlspecialchars($status ?? 'Unknown') . "</p>
-                <p><strong>Response Body:</strong><br>" . htmlspecialchars($response ?? 'No response data') . "</p>
-            </div>";
+            <div id='debugConsole' style='margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; transition: height 0.3s ease-in-out;'>
+                <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;'>
+                    <h3 style='margin: 0;'>API Request/Response Log</h3>
+                    <button id='toggleDebugConsole' style='background: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;'>Minimize</button>
+                </div>
+                <div id='debugConsoleContent'>
+                    <p><strong>API URL:</strong> " . htmlspecialchars($apiUrl) . "</p>
+                    <p><strong>Request Payload:</strong><br>" . htmlspecialchars($apiPayload ?? 'No payload data') . "</p>
+                    <p><strong>Response Status:</strong> " . htmlspecialchars($status ?? 'Unknown') . "</p>
+                    <p><strong>Response Body:</strong><br>" . htmlspecialchars($response ?? 'No response data') . "</p>
+                </div>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const toggleButton = document.getElementById('toggleDebugConsole');
+                    const debugConsole = document.getElementById('debugConsole');
+                    const debugContent = document.getElementById('debugConsoleContent');
+
+                    toggleButton.addEventListener('click', function() {
+                        if (debugContent.style.display === 'none') {
+                            // Expand
+                            debugContent.style.display = 'block';
+                            toggleButton.textContent = 'Minimize';
+                            debugConsole.style.height = 'auto';
+                        } else {
+                            // Minimize
+                            debugContent.style.display = 'none';
+                            toggleButton.textContent = 'Expand';
+                            debugConsole.style.height = 'auto';
+                        }
+                    });
+                });
+            </script>";
         }
 
         echo "
@@ -190,13 +216,39 @@ echo "
 
 if (isset($config['debug']) && $config['debug'] === true) {
     echo "
-    <div style='margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;'>
-        <h3 style='margin-top: 0;'>API Request/Response Log</h3>
-        <p><strong>API URL:</strong> " . htmlspecialchars($apiUrl) . "</p>
-        <p><strong>Request Payload:</strong><br>" . htmlspecialchars($apiPayload ?? 'No payload data') . "</p>
-        <p><strong>Response Status:</strong> " . htmlspecialchars($status ?? 'Unknown') . "</p>
-        <p><strong>Response Body:</strong><br>" . htmlspecialchars($response ?? 'No response data') . "</p>
-    </div>";
+    <div id='debugConsole2' style='margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; transition: height 0.3s ease-in-out;'>
+        <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;'>
+            <h3 style='margin: 0;'>API Request/Response Log</h3>
+            <button id='toggleDebugConsole2' style='background: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;'>Minimize</button>
+        </div>
+        <div id='debugConsoleContent2'>
+            <p><strong>API URL:</strong> " . htmlspecialchars($apiUrl) . "</p>
+            <p><strong>Request Payload:</strong><br>" . htmlspecialchars($apiPayload ?? 'No payload data') . "</p>
+            <p><strong>Response Status:</strong> " . htmlspecialchars($status ?? 'Unknown') . "</p>
+            <p><strong>Response Body:</strong><br>" . htmlspecialchars($response ?? 'No response data') . "</p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('toggleDebugConsole2');
+            const debugConsole = document.getElementById('debugConsole2');
+            const debugContent = document.getElementById('debugConsoleContent2');
+
+            toggleButton.addEventListener('click', function() {
+                if (debugContent.style.display === 'none') {
+                    // Expand
+                    debugContent.style.display = 'block';
+                    toggleButton.textContent = 'Minimize';
+                    debugConsole.style.height = 'auto';
+                } else {
+                    // Minimize
+                    debugContent.style.display = 'none';
+                    toggleButton.textContent = 'Expand';
+                    debugConsole.style.height = 'auto';
+                }
+            });
+        });
+    </script>";
 }
 
 echo "

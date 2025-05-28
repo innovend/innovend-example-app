@@ -195,7 +195,7 @@ $config = json_decode(file_get_contents('config.json'), true);
 
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" value="<?php echo htmlspecialchars($config['password']); ?>" required>
+                <input type="text" id="password" name="password" value="<?php echo htmlspecialchars($config['password']); ?>" required>
             </div>
 
             <div class="form-group">

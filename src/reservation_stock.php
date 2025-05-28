@@ -150,17 +150,44 @@ $apiDebugInfo = [
 <?php endforeach; ?>
 
 <?php if (isset($config['debug']) && $config['debug'] === true): ?>
-<div style="margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; position: fixed; bottom: 20px; right: 20px; max-width: 80%; max-height: 80%; overflow: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-    <h3 style="margin-top: 0;">API Request/Response Log</h3>
-    <p><strong>API URL:</strong> <?= htmlspecialchars($apiDebugInfo['url']) ?></p>
-    <p><strong>Request Headers:</strong><br>
-    <?php foreach ($apiDebugInfo['headers'] as $header): ?>
-        <?= htmlspecialchars($header) ?><br>
-    <?php endforeach; ?>
-    </p>
-    <p><strong>Response Status:</strong> <?= htmlspecialchars($apiDebugInfo['status']) ?></p>
-    <p><strong>Response Body:</strong><br><?= htmlspecialchars($apiDebugInfo['response']) ?></p>
+<div id="debugConsole" style="margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; position: fixed; bottom: 20px; right: 20px; max-width: 80%; max-height: 80%; overflow: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); transition: height 0.3s ease-in-out;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0;">API Request/Response Log</h3>
+        <button id="toggleDebugConsole" style="background: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">Minimize</button>
+    </div>
+    <div id="debugConsoleContent">
+        <p><strong>API URL:</strong> <?= htmlspecialchars($apiDebugInfo['url']) ?></p>
+        <p><strong>Request Headers:</strong><br>
+        <?php foreach ($apiDebugInfo['headers'] as $header): ?>
+            <?= htmlspecialchars($header) ?><br>
+        <?php endforeach; ?>
+        </p>
+        <p><strong>Response Status:</strong> <?= htmlspecialchars($apiDebugInfo['status']) ?></p>
+        <p><strong>Response Body:</strong><br><?= htmlspecialchars($apiDebugInfo['response']) ?></p>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButton = document.getElementById('toggleDebugConsole');
+        const debugConsole = document.getElementById('debugConsole');
+        const debugContent = document.getElementById('debugConsoleContent');
+
+        toggleButton.addEventListener('click', function() {
+            if (debugContent.style.display === 'none') {
+                // Expand
+                debugContent.style.display = 'block';
+                toggleButton.textContent = 'Minimize';
+                debugConsole.style.height = 'auto';
+            } else {
+                // Minimize
+                debugContent.style.display = 'none';
+                toggleButton.textContent = 'Expand';
+                debugConsole.style.height = 'auto';
+            }
+        });
+    });
+</script>
 <?php endif; ?>
 </body>
 </html>

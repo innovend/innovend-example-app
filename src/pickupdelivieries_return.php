@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
 
     // Call the API to create a pickup delivery
     $apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
-    $apiUrl = "{$apiBaseUrl}/api/external/pickupdeliveries/create/false";
+    $apiUrl = "{$apiBaseUrl}/api/external/pickupdeliveries/create/true";
     $payload = json_encode([
         "MachineId" => $selectedMachine,
         "Returnable" => true,
@@ -176,13 +176,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
         </p>
 
         <?php if (isset($config['debug']) && $config['debug'] === true): ?>
-        <div style="margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;">
-            <h3 style="margin-top: 0;">API Request/Response Log</h3>
-            <p><strong>API URL:</strong> <?= htmlspecialchars($apiUrl) ?></p>
-            <p><strong>Request Payload:</strong><br><?= htmlspecialchars($payload ?? 'No payload data') ?></p>
-            <p><strong>Response Status:</strong> <?= htmlspecialchars($apiHttpStatus ?? 'Unknown') ?></p>
-            <p><strong>Response Body:</strong><br><?= htmlspecialchars($apiResponse ?? 'No response data') ?></p>
+        <div id="debugConsole" style="margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; transition: height 0.3s ease-in-out;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0;">API Request/Response Log</h3>
+                <button id="toggleDebugConsole" style="background: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">Minimize</button>
+            </div>
+            <div id="debugConsoleContent">
+                <p><strong>API URL:</strong> <?= htmlspecialchars($apiUrl) ?></p>
+                <p><strong>Request Payload:</strong><br><?= htmlspecialchars($payload ?? 'No payload data') ?></p>
+                <p><strong>Response Status:</strong> <?= htmlspecialchars($apiHttpStatus ?? 'Unknown') ?></p>
+                <p><strong>Response Body:</strong><br><?= htmlspecialchars($apiResponse ?? 'No response data') ?></p>
+            </div>
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const toggleButton = document.getElementById('toggleDebugConsole');
+                const debugConsole = document.getElementById('debugConsole');
+                const debugContent = document.getElementById('debugConsoleContent');
+
+                toggleButton.addEventListener('click', function() {
+                    if (debugContent.style.display === 'none') {
+                        // Expand
+                        debugContent.style.display = 'block';
+                        toggleButton.textContent = 'Minimize';
+                        debugConsole.style.height = 'auto';
+                    } else {
+                        // Minimize
+                        debugContent.style.display = 'none';
+                        toggleButton.textContent = 'Expand';
+                        debugConsole.style.height = 'auto';
+                    }
+                });
+            });
+        </script>
         <?php endif; ?>
 
         <a href="index.php" class="back-button">Back to main menu</a>
