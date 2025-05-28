@@ -114,9 +114,27 @@ The application uses the following API endpoints:
 
 ## Project Structure
 
-The project is organized into the following directories:
+The project is organized into the following directories and files:
 
+- `README.md` - This documentation file
+- `docker-compose.yml` - Docker configuration for running the application
 - `src/` - Main application code
+  - `index.php` - Main entry point of the application
+  - `ondemand.php` - Handles on-demand asset usage functionality
+  - `setup.php` - Initial setup and configuration script
   - `conf/` - Configuration files and editor
+    - `config-example.json` - Example configuration template
+    - `config.json` - Application configuration file
+    - `config_editor.php` - Configuration editor interface
   - `stockreservations/` - Files related to stock reservations
+    - `fallback.png` - Default image for products without thumbnails
+    - `image.php` - Handles product image display
+    - `reservation_create.php` - Creates new reservations
+    - `reservation_start.php` - Initiates the reservation process
+    - `reservation_status.php` - Shows reservation status
+    - `reservation_stock.php` - Manages stock for reservations
   - `pickupdeliveries/` - Files related to pickup and delivery processes
+    - `pickupdeliveries_create.php` - Creates pickup delivery requests
+    - `pickupdeliveries_overview.php` - Shows overview of pickup deliveries
+    - `pickupdeliveries_start.php` - Initiates pickup delivery process
+    - `pickupdelivieries_return.php` - Handles return to locker functionality
