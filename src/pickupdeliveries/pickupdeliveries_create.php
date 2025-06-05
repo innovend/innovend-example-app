@@ -161,6 +161,45 @@ if (isset($_POST['create_order'])) {
             background: #f0f2f5;
             margin: 0;
             padding: 20px 0;
+            overflow-x: hidden;
+        }
+
+        .debug-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 20%; /* 1/5 of screen width */
+            height: 100vh;
+            background-color: #f8f9fa;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            padding: 15px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .debug-panel.minimized {
+            transform: translateX(calc(100% - 30px));
+        }
+
+        .debug-panel-toggle {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            padding: 10px;
+            cursor: pointer;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            height: 100px;
         }
 
         .container {
@@ -336,10 +375,10 @@ if (isset($_POST['create_order'])) {
         <p>Selected location: <?= htmlspecialchars($selectedMachine . ' - ' . $selectedMachineName) ?></p>
 
         <?php if (isset($config['debug']) && $config['debug'] === true): ?>
-        <div id="debugConsole" style="margin-top: 20px; text-align: left; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; transition: height 0.3s ease-in-out;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div id="debugConsole" class="debug-panel">
+            <button id="toggleDebugConsole" class="debug-panel-toggle">Show/Hide Debug</button>
+            <div style="margin-bottom: 10px;">
                 <h3 style="margin: 0;">API Request/Response Log</h3>
-                <button id="toggleDebugConsole" style="background: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">Minimize</button>
             </div>
             <div id="debugConsoleContent">
                 <p><strong>API URL:</strong> <?= htmlspecialchars($apiUrl) ?></p>
@@ -353,20 +392,12 @@ if (isset($_POST['create_order'])) {
             document.addEventListener('DOMContentLoaded', function() {
                 const toggleButton = document.getElementById('toggleDebugConsole');
                 const debugConsole = document.getElementById('debugConsole');
-                const debugContent = document.getElementById('debugConsoleContent');
+
+                // Initialize as minimized if preferred
+                debugConsole.classList.add('minimized');
 
                 toggleButton.addEventListener('click', function() {
-                    if (debugContent.style.display === 'none') {
-                        // Expand
-                        debugContent.style.display = 'block';
-                        toggleButton.textContent = 'Minimize';
-                        debugConsole.style.height = 'auto';
-                    } else {
-                        // Minimize
-                        debugContent.style.display = 'none';
-                        toggleButton.textContent = 'Expand';
-                        debugConsole.style.height = 'auto';
-                    }
+                    debugConsole.classList.toggle('minimized');
                 });
             });
         </script>
