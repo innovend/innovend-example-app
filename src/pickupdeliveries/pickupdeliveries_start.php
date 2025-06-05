@@ -23,6 +23,14 @@ $response = curl_exec($curl);
 $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 curl_close($curl);
 
+// Store API call information for debug console
+$apiDebugInfo = [
+    'url' => $url,
+    'headers' => $headers,
+    'status' => $httpStatus,
+    'response' => $response
+];
+
 $machines = [];
 
 if ($httpStatus === 200) {
@@ -94,13 +102,52 @@ if ($httpStatus === 200) {
             border-radius: 4px;
             margin-top: 20px;
         }
+
+        /* Debug Console Styles */
+        .debug-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 20%; /* 1/5 of screen width */
+            height: 100vh;
+            background-color: #f8f9fa;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            padding: 15px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .debug-panel.minimized {
+            transform: translateX(calc(100% - 30px));
+        }
+
+        .debug-panel-toggle {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            padding: 10px;
+            cursor: pointer;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            height: 100px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>Create Click & Collect Order</h2>
     <div class="ticket">Ticket number: <?= htmlspecialchars($ticketNumber) ?></div>
-    
+
     <p>Start a new click & collect order by selecting the desired vending machine location.</p>
     <form method="POST" action="pickupdeliveries_create.php">
         <input type="hidden" name="ticket" value="<?= htmlspecialchars($ticketNumber) ?>">
@@ -117,5 +164,38 @@ if ($httpStatus === 200) {
     </form>
     <a href="../index.php" class="back-button">Back to main menu</a>
 </div>
+
+<?php if (isset($config['debug']) && $config['debug'] === true): ?>
+<div id="debugConsole" class="debug-panel">
+    <button id="toggleDebugConsole" class="debug-panel-toggle">Show/Hide Debug</button>
+    <div style="margin-bottom: 10px;">
+        <h3 style="margin: 0;">API Request/Response Log</h3>
+    </div>
+    <div id="debugConsoleContent">
+        <p><strong>API URL:</strong> <?= htmlspecialchars($apiDebugInfo['url']) ?></p>
+        <p><strong>Request Headers:</strong><br>
+        <?php foreach ($apiDebugInfo['headers'] as $header): ?>
+            <?= htmlspecialchars($header) ?><br>
+        <?php endforeach; ?>
+        </p>
+        <p><strong>Response Status:</strong> <?= htmlspecialchars($apiDebugInfo['status']) ?></p>
+        <p><strong>Response Body:</strong><br><pre style="max-height: 200px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($apiDebugInfo['response']) ?></pre></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButton = document.getElementById('toggleDebugConsole');
+        const debugConsole = document.getElementById('debugConsole');
+
+        // Initialize as minimized
+        debugConsole.classList.add('minimized');
+
+        toggleButton.addEventListener('click', function() {
+            debugConsole.classList.toggle('minimized');
+        });
+    });
+</script>
+<?php endif; ?>
 </body>
 </html>

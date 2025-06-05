@@ -75,6 +75,45 @@
         .button.admin:hover {
             background-color: #5a6268;
         }
+
+        /* Debug Console Styles */
+        .debug-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 20%; /* 1/5 of screen width */
+            height: 100vh;
+            background-color: #f8f9fa;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            padding: 15px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .debug-panel.minimized {
+            transform: translateX(calc(100% - 30px));
+        }
+
+        .debug-panel-toggle {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            padding: 10px;
+            cursor: pointer;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            height: 100px;
+        }
     </style>
 </head>
 <body>
@@ -105,5 +144,40 @@
             <a href="conf/config_editor.php" class="button admin">Edit Configuration</a>
         </div>
     </div>
+
+    <?php
+    // Get config to check if debug mode is enabled
+    $config = [];
+    if (file_exists('conf/config.json')) {
+        $config = json_decode(file_get_contents('conf/config.json'), true);
+    }
+    ?>
+
+    <?php if (isset($config['debug']) && $config['debug'] === true): ?>
+    <div id="debugConsole" class="debug-panel">
+        <button id="toggleDebugConsole" class="debug-panel-toggle">Show/Hide Debug</button>
+        <div style="margin-bottom: 10px;">
+            <h3 style="margin: 0;">Debug Information</h3>
+        </div>
+        <div id="debugConsoleContent">
+            <p>No API calls were made on this page.</p>
+            <p>This is the main landing page of the application.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('toggleDebugConsole');
+            const debugConsole = document.getElementById('debugConsole');
+
+            // Initialize as minimized
+            debugConsole.classList.add('minimized');
+
+            toggleButton.addEventListener('click', function() {
+                debugConsole.classList.toggle('minimized');
+            });
+        });
+    </script>
+    <?php endif; ?>
 </body>
 </html>

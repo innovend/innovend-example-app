@@ -4,6 +4,7 @@ $config = json_decode(file_get_contents('../conf/config.json'), true);
 // Voeg deze functie toe voor het annuleren van reserveringen
 function cancelReservation($stockreservationId, $machineId, $deliveryDate) {
     global $config;
+    global $cancelApiDebugInfo; // Make debug info available globally
 
     $apiBaseUrl = $config['apiUrl'] ?? 'https://api.vendingweb.eu';
     $cancelUrl = "{$apiBaseUrl}/api/external/stockreservations/update/false/true";
@@ -35,6 +36,15 @@ function cancelReservation($stockreservationId, $machineId, $deliveryDate) {
     $response = curl_exec($curl);
     $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
+
+    // Store API call information for debug console
+    $cancelApiDebugInfo = [
+        'url' => $cancelUrl,
+        'headers' => $headers,
+        'requestBody' => $requestBody,
+        'status' => $httpStatus,
+        'response' => $response
+    ];
 
     return $httpStatus === 200;
 }
@@ -72,6 +82,14 @@ $response = curl_exec($curl);
 $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 curl_close($curl);
 
+// Store API call information for debug console
+$machinesApiDebugInfo = [
+    'url' => $machinesUrl,
+    'headers' => $headers,
+    'status' => $httpStatus,
+    'response' => $response
+];
+
 $machines = [];
 if ($httpStatus === 200) {
     $machines = json_decode($response, true);
@@ -104,6 +122,15 @@ if ($selectedMachine !== '') {
     $response = curl_exec($curl);
     $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
+
+    // Store API call information for debug console
+    $reservationsApiDebugInfo = [
+        'url' => $reservationsUrl,
+        'headers' => $headers,
+        'requestBody' => $requestBody,
+        'status' => $httpStatus,
+        'response' => $response
+    ];
 
     if ($httpStatus === 200) {
         $reservations = json_decode($response, true);
@@ -282,6 +309,45 @@ function getStatusText($statusId) {
 
         .cancel-button:hover {
             background-color: #c82333;
+        }
+
+        /* Debug Console Styles */
+        .debug-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 20%; /* 1/5 of screen width */
+            height: 100vh;
+            background-color: #f8f9fa;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            padding: 15px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .debug-panel.minimized {
+            transform: translateX(calc(100% - 30px));
+        }
+
+        .debug-panel-toggle {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            padding: 10px;
+            cursor: pointer;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            height: 100px;
         }
     </style>
     <script>
@@ -476,5 +542,67 @@ function getStatusText($statusId) {
         <div class="no-data">Select a machine to view reservations.</div>
     <?php endif; ?>
 </div>
+
+<?php if (isset($config['debug']) && $config['debug'] === true): ?>
+<div id="debugConsole" class="debug-panel">
+    <button id="toggleDebugConsole" class="debug-panel-toggle">Show/Hide Debug</button>
+    <div style="margin-bottom: 10px;">
+        <h3 style="margin: 0;">API Request/Response Log</h3>
+    </div>
+    <div id="debugConsoleContent">
+        <h4>Machines API Call</h4>
+        <p><strong>API URL:</strong> <?= htmlspecialchars($machinesApiDebugInfo['url']) ?></p>
+        <p><strong>Request Headers:</strong><br>
+        <?php foreach ($machinesApiDebugInfo['headers'] as $header): ?>
+            <?= htmlspecialchars($header) ?><br>
+        <?php endforeach; ?>
+        </p>
+        <p><strong>Response Status:</strong> <?= htmlspecialchars($machinesApiDebugInfo['status']) ?></p>
+        <p><strong>Response Body:</strong><br><pre style="max-height: 200px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($machinesApiDebugInfo['response']) ?></pre></p>
+
+        <?php if (isset($reservationsApiDebugInfo)): ?>
+        <hr style="margin: 20px 0;">
+        <h4>Reservations API Call</h4>
+        <p><strong>API URL:</strong> <?= htmlspecialchars($reservationsApiDebugInfo['url']) ?></p>
+        <p><strong>Request Headers:</strong><br>
+        <?php foreach ($reservationsApiDebugInfo['headers'] as $header): ?>
+            <?= htmlspecialchars($header) ?><br>
+        <?php endforeach; ?>
+        </p>
+        <p><strong>Request Body:</strong><br><pre style="max-height: 100px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($reservationsApiDebugInfo['requestBody']) ?></pre></p>
+        <p><strong>Response Status:</strong> <?= htmlspecialchars($reservationsApiDebugInfo['status']) ?></p>
+        <p><strong>Response Body:</strong><br><pre style="max-height: 200px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($reservationsApiDebugInfo['response']) ?></pre></p>
+        <?php endif; ?>
+
+        <?php if (isset($cancelApiDebugInfo)): ?>
+        <hr style="margin: 20px 0;">
+        <h4>Cancel Reservation API Call</h4>
+        <p><strong>API URL:</strong> <?= htmlspecialchars($cancelApiDebugInfo['url']) ?></p>
+        <p><strong>Request Headers:</strong><br>
+        <?php foreach ($cancelApiDebugInfo['headers'] as $header): ?>
+            <?= htmlspecialchars($header) ?><br>
+        <?php endforeach; ?>
+        </p>
+        <p><strong>Request Body:</strong><br><pre style="max-height: 100px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($cancelApiDebugInfo['requestBody']) ?></pre></p>
+        <p><strong>Response Status:</strong> <?= htmlspecialchars($cancelApiDebugInfo['status']) ?></p>
+        <p><strong>Response Body:</strong><br><pre style="max-height: 200px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($cancelApiDebugInfo['response']) ?></pre></p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButton = document.getElementById('toggleDebugConsole');
+        const debugConsole = document.getElementById('debugConsole');
+
+        // Initialize as minimized
+        debugConsole.classList.add('minimized');
+
+        toggleButton.addEventListener('click', function() {
+            debugConsole.classList.toggle('minimized');
+        });
+    });
+</script>
+<?php endif; ?>
 </body>
 </html>
