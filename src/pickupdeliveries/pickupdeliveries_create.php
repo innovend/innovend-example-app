@@ -57,7 +57,11 @@ $formErrors = [];
 // If the form is submitted with all required fields
 if (isset($_POST['create_order'])) {
     // Validate required fields
-    $requiredFields = ['firstName', 'lastName', 'email'];
+    $requiredFields = ['firstName', 'lastName'];
+    // Only require email if doSendEmailAfterCreate is checked
+    if (isset($_POST['doSendEmailAfterCreate'])) {
+        $requiredFields[] = 'email';
+    }
     foreach ($requiredFields as $field) {
         if (empty($_POST[$field])) {
             $formErrors[$field] = 'This field is required';
@@ -421,7 +425,7 @@ if (isset($_POST['create_order'])) {
                 <div class="form-col">
                     <div class="form-group">
                         <label for="firstName">First Name *</label>
-                        <input type="text" id="firstName" name="firstName" value="<?= htmlspecialchars($_POST['firstName'] ?? '') ?>" required>
+                        <input type="text" id="firstName" name="firstName" value="<?= isset($_POST['firstName']) ? htmlspecialchars($_POST['firstName']) : '' ?>" required>
                         <?php if (isset($formErrors['firstName'])): ?>
                             <div class="error-message"><?= htmlspecialchars($formErrors['firstName']) ?></div>
                         <?php endif; ?>
@@ -430,7 +434,7 @@ if (isset($_POST['create_order'])) {
                 <div class="form-col">
                     <div class="form-group">
                         <label for="lastName">Last Name *</label>
-                        <input type="text" id="lastName" name="lastName" value="<?= htmlspecialchars($_POST['lastName'] ?? '') ?>" required>
+                        <input type="text" id="lastName" name="lastName" value="<?= isset($_POST['lastName']) ? htmlspecialchars($_POST['lastName']) : '' ?>" required>
                         <?php if (isset($formErrors['lastName'])): ?>
                             <div class="error-message"><?= htmlspecialchars($formErrors['lastName']) ?></div>
                         <?php endif; ?>
@@ -541,7 +545,7 @@ if (isset($_POST['create_order'])) {
 
             <div class="form-group" id="emailAddressGroup" style="display: none;">
                 <label for="email">Email Address *</label>
-                <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
+                <input type="email" id="email" name="email" value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>">
                 <?php if (isset($formErrors['email'])): ?>
                     <div class="error-message"><?= htmlspecialchars($formErrors['email']) ?></div>
                 <?php endif; ?>
@@ -553,12 +557,14 @@ if (isset($_POST['create_order'])) {
                     const emailAfterFillGroup = document.getElementById('sendEmailAfterFillGroup');
                     const emailAddressGroup = document.getElementById('emailAddressGroup');
                     const emailAfterFillCheckbox = document.querySelector('input[name="doSendEmailAfterFill"]');
+                    const emailInput = document.getElementById('email');
 
                     // Initial state
                     if (emailAfterCreateCheckbox.checked) {
                         emailAfterFillGroup.style.display = 'block';
                         emailAddressGroup.style.display = 'block';
                         emailAfterFillCheckbox.checked = true;
+                        emailInput.setAttribute('required', 'required');
                     }
 
                     // Add event listener
@@ -567,10 +573,12 @@ if (isset($_POST['create_order'])) {
                             emailAfterFillGroup.style.display = 'block';
                             emailAddressGroup.style.display = 'block';
                             emailAfterFillCheckbox.checked = true;
+                            emailInput.setAttribute('required', 'required');
                         } else {
                             emailAfterFillGroup.style.display = 'none';
                             emailAddressGroup.style.display = 'none';
                             emailAfterFillCheckbox.checked = false;
+                            emailInput.removeAttribute('required');
                         }
                     });
                 });
