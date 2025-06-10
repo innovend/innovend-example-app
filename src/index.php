@@ -134,10 +134,6 @@
             <a href="pickupdeliveries/pickupdelivieries_return.php" class="button">Create return to locker code</a>
         </div>
 
-        <div class="button-group">
-            <h2>Webhook receivers</h2>
-            <a href="ondemand.php" class="button">Show received webhook sales data</a>
-        </div>
 
         <div class="button-group">
             <h2>System</h2>

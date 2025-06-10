@@ -7,14 +7,12 @@ The Innovend Example App is a demonstration application to help developers getti
 The application serves as a mock server to demonstrate various workflows:
 - Product reservation process
 - Reservation status tracking
-- On-demand asset usage
 - Return to locker functionality
 
 ## Features
 
 - **Product Reservation**: Simulate the process of reserving products from a vending machine
 - **Reservation Overview**: View and manage existing reservations
-- **On-Demand Asset Usage**: Demonstrate on-demand asset usage tracking
 - **Return to Locker**: Create return codes for returning assets to lockers
 - **Configuration Editor**: Easily configure API credentials and environment settings
 - **Debug Console**: View API requests and responses when debug mode is enabled
@@ -107,7 +105,6 @@ The application uses the following API endpoints:
 2. Select one of the available functions:
    - Start product reservation
    - View reservation overview
-   - Show on-demand asset usage
    - Create return to locker code
    - Edit configuration
 3. Follow the on-screen instructions for each function
@@ -120,7 +117,6 @@ The project is organized into the following directories and files:
 - `docker-compose.yml` - Docker configuration for running the application
 - `src/` - Main application code
   - `index.php` - Main entry point of the application
-  - `ondemand.php` - Handles on-demand asset usage functionality
   - `setup.php` - Initial setup and configuration script
   - `conf/` - Configuration files and editor
     - `config-example.json` - Example configuration template
