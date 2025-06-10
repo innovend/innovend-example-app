@@ -19,9 +19,50 @@
             background: #fff;
             padding: 30px 40px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 500px;
+            width: 900px;
+        }
+
+        .feature-row {
+            display: flex;
+            margin-bottom: 25px;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .button-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .explanation-container {
+            flex: 1;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .explanation-container h3 {
+            margin-top: 0;
+            color: #495057;
+            font-size: 18px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .explanation-container p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         .button-group {
@@ -84,7 +125,7 @@
             width: 20%; /* 1/5 of screen width */
             height: 100vh;
             background-color: #f8f9fa;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
             transition: transform 0.3s ease-in-out;
             z-index: 1000;
@@ -117,39 +158,66 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Innovend Example App</h1>
-        <p>This application contains examples on how our API's can be implemented and used.</p>
+<div class="container">
+    <h1>Innovend Example App</h1>
+    <p>This application contains examples on how our API's can be implemented and used. Start by entering you API
+        credentials and apiKey in the System menu. </p>
 
-        <div class="button-group">
-            <h2>Stock Reservations</h2>
-            <a href="stockreservations/reservation_start.php" class="button">Start product reservation</a>
-            <a href="stockreservations/reservation_status.php" class="button">Reservation overview</a>
+    <div class="feature-row">
+        <div class="button-container">
+            <div class="button-group">
+                <h2>Stock Reservations</h2>
+                <a href="stockreservations/reservation_start.php" class="button">Start product reservation</a>
+                <a href="stockreservations/reservation_status.php" class="button">Reservation overview</a>
+            </div>
         </div>
-
-        <div class="button-group">
-            <h2>Cick & Collect (pickup deliveries)</h2>
-            <a href="pickupdeliveries/pickupdeliveries_start.php" class="button">Create click & collect order</a>
-            <a href="pickupdeliveries/pickupdeliveries_overview.php" class="button">Click & Collect overview</a>
-            <a href="pickupdeliveries/pickupdelivieries_return.php" class="button">Create return to locker code</a>
-        </div>
-
-
-        <div class="button-group">
-            <h2>System</h2>
-            <a href="conf/config_editor.php" class="button admin">Edit Configuration</a>
+        <div class="explanation-container">
+            <h3>About Stock Reservations</h3>
+            <p>Stock Reservations allow you to reserve products from a vending machine before physically visiting it. This ensures the product will be available when you arrive.</p>
+            <p>Use "Start product reservation" to begin a new reservation process, or "Reservation overview" to check the status of your existing reservations.</p>
         </div>
     </div>
 
-    <?php
-    // Get config to check if debug mode is enabled
-    $config = [];
-    if (file_exists('conf/config.json')) {
-        $config = json_decode(file_get_contents('conf/config.json'), true);
-    }
-    ?>
+    <div class="feature-row">
+        <div class="button-container">
+            <div class="button-group">
+                <h2>Click & Collect (pickup deliveries)</h2>
+                <a href="pickupdeliveries/pickupdeliveries_start.php" class="button">Create click & collect order</a>
+                <a href="pickupdeliveries/pickupdeliveries_overview.php" class="button">Click & Collect overview</a>
+                <a href="pickupdeliveries/pickupdelivieries_return.php" class="button">Create return to locker code</a>
+            </div>
+        </div>
+        <div class="explanation-container">
+            <h3>About Click & Collect</h3>
+            <p>Click & Collect allows you to order products online and pick them up from a locker at your convenience.</p>
+            <p>Create a new order, view your existing orders, or generate a return code if you need to return an item to a locker.</p>
+        </div>
+    </div>
 
-    <?php if (isset($config['debug']) && $config['debug'] === true): ?>
+    <div class="feature-row">
+        <div class="button-container">
+            <div class="button-group">
+                <h2>System</h2>
+                <a href="conf/config_editor.php" class="button admin">Edit Configuration</a>
+            </div>
+        </div>
+        <div class="explanation-container">
+            <h3>System Configuration</h3>
+            <p>Configure your API credentials and application settings here.</p>
+            <p>You'll need to set up your API key, username, password, and environment before using the other features of this application.</p>
+        </div>
+    </div>
+</div>
+
+<?php
+// Get config to check if debug mode is enabled
+$config = [];
+if (file_exists('conf/config.json')) {
+    $config = json_decode(file_get_contents('conf/config.json'), true);
+}
+?>
+
+<?php if (isset($config['debug']) && $config['debug'] === true): ?>
     <div id="debugConsole" class="debug-panel">
         <button id="toggleDebugConsole" class="debug-panel-toggle">Show/Hide Debug</button>
         <div style="margin-bottom: 10px;">
@@ -162,18 +230,18 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const toggleButton = document.getElementById('toggleDebugConsole');
             const debugConsole = document.getElementById('debugConsole');
 
             // Initialize as minimized
             debugConsole.classList.add('minimized');
 
-            toggleButton.addEventListener('click', function() {
+            toggleButton.addEventListener('click', function () {
                 debugConsole.classList.toggle('minimized');
             });
         });
     </script>
-    <?php endif; ?>
+<?php endif; ?>
 </body>
 </html>
