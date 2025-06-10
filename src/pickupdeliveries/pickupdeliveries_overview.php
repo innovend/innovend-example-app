@@ -99,10 +99,11 @@ if ($clientId !== '') {
 function getStatusText($statusId) {
     return match ($statusId) {
         1 => 'Created',
-        2 => 'Filled',
-        3 => 'Delivered',
-        4 => 'Returned',
-        5 => 'Expired',
+        3 => 'Filled',
+        6 => 'Delivered',
+        8 => 'Cancelled',
+        10 => 'Returned',
+        12 => 'Return collected',
         default => 'Status ' . $statusId
     };
 }
@@ -216,23 +217,28 @@ function getStatusText($statusId) {
         }
 
         .status-filled {
-            background-color: #fff3e0;
-            color: #e65100;
-        }
-
-        .status-delivered {
             background-color: #e8f5e9;
             color: #2e7d32;
         }
 
-        .status-returned {
+        .status-delivered {
             background-color: #f3e5f5;
             color: #7b1fa2;
         }
 
-        .status-expired {
+        .status-cancelled {
             background-color: #ffebee;
             color: #c62828;
+        }
+
+        .status-returned {
+            background-color: #f5f5f5;
+            color: #616161;
+        }
+
+        .status-return-collected {
+            background-color: #263238;
+            color: #eceff1;
         }
 
         .status-other {
@@ -423,10 +429,11 @@ function getStatusText($statusId) {
                         <?php
                         $statusClass = match ($delivery['Status']) {
                             1 => 'status-created',
-                            2 => 'status-filled',
-                            3 => 'status-delivered',
-                            4 => 'status-returned',
-                            5 => 'status-expired',
+                            3 => 'status-filled',
+                            6 => 'status-delivered',
+                            8 => 'status-cancelled',
+                            10 => 'status-returned',
+                            12 => 'status-return-collected',
                             default => 'status-other'
                         };
                         $statusText = getStatusText($delivery['Status']);
