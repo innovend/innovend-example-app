@@ -47,7 +47,7 @@ function createReservation($config, $machineId, $orderNr, $products, $now, $expi
             "ExpirationDate" => $expiration,
             "UnlockCode" => $unlockCode,
             "OrderNr" => $orderNr,
-            "IsPaid" => true,
+            "IsPaid" => false,
             "Products" => $productEntries
         ]
     ]);

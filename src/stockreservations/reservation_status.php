@@ -321,7 +321,6 @@ function getStatusText($statusId) {
             background-color: #f8f9fa;
             box-shadow: -2px 0 10px rgba(0,0,0,0.1);
             overflow-y: auto;
-            transition: transform 0.3s ease-in-out;
             z-index: 1000;
             padding: 15px;
             box-sizing: border-box;
@@ -330,24 +329,9 @@ function getStatusText($statusId) {
             text-align: left;
         }
 
-        .debug-panel.minimized {
-            transform: translateX(calc(100% - 30px));
-        }
-
-        .debug-panel-toggle {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px 0 0 4px;
-            padding: 10px;
-            cursor: pointer;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            height: 100px;
+        /* Main content area adjusted to not be hidden by debug panel */
+        body {
+            padding-right: 22%; /* Slightly more than debug panel width */
         }
     </style>
     <script>
@@ -545,7 +529,6 @@ function getStatusText($statusId) {
 
 <?php if (isset($config['debug']) && $config['debug'] === true): ?>
 <div id="debugConsole" class="debug-panel">
-    <button id="toggleDebugConsole" class="debug-panel-toggle">Show/Hide Debug</button>
     <div style="margin-bottom: 10px;">
         <h3 style="margin: 0;">API Request/Response Log</h3>
     </div>
@@ -558,7 +541,7 @@ function getStatusText($statusId) {
         <?php endforeach; ?>
         </p>
         <p><strong>Response Status:</strong> <?= htmlspecialchars($machinesApiDebugInfo['status']) ?></p>
-        <p><strong>Response Body:</strong><br><pre style="max-height: 200px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($machinesApiDebugInfo['response']) ?></pre></p>
+        <p><strong>Response Body:</strong><br><?= htmlspecialchars($machinesApiDebugInfo['response']) ?></p>
 
         <?php if (isset($reservationsApiDebugInfo)): ?>
         <hr style="margin: 20px 0;">
@@ -569,9 +552,9 @@ function getStatusText($statusId) {
             <?= htmlspecialchars($header) ?><br>
         <?php endforeach; ?>
         </p>
-        <p><strong>Request Body:</strong><br><pre style="max-height: 100px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($reservationsApiDebugInfo['requestBody']) ?></pre></p>
+        <p><strong>Request Body:</strong><br><?= htmlspecialchars($reservationsApiDebugInfo['requestBody']) ?></p>
         <p><strong>Response Status:</strong> <?= htmlspecialchars($reservationsApiDebugInfo['status']) ?></p>
-        <p><strong>Response Body:</strong><br><pre style="max-height: 200px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($reservationsApiDebugInfo['response']) ?></pre></p>
+        <p><strong>Response Body:</strong><br><?= htmlspecialchars($reservationsApiDebugInfo['response']) ?></p>
         <?php endif; ?>
 
         <?php if (isset($cancelApiDebugInfo)): ?>
@@ -583,26 +566,14 @@ function getStatusText($statusId) {
             <?= htmlspecialchars($header) ?><br>
         <?php endforeach; ?>
         </p>
-        <p><strong>Request Body:</strong><br><pre style="max-height: 100px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($cancelApiDebugInfo['requestBody']) ?></pre></p>
+        <p><strong>Request Body:</strong><br><?= htmlspecialchars($cancelApiDebugInfo['requestBody']) ?></p>
         <p><strong>Response Status:</strong> <?= htmlspecialchars($cancelApiDebugInfo['status']) ?></p>
-        <p><strong>Response Body:</strong><br><pre style="max-height: 200px; overflow-y: auto; background: #f1f1f1; padding: 10px; font-size: 11px;"><?= htmlspecialchars($cancelApiDebugInfo['response']) ?></pre></p>
+        <p><strong>Response Body:</strong><br><?= htmlspecialchars($cancelApiDebugInfo['response']) ?></p>
         <?php endif; ?>
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleButton = document.getElementById('toggleDebugConsole');
-        const debugConsole = document.getElementById('debugConsole');
-
-        // Initialize as minimized
-        debugConsole.classList.add('minimized');
-
-        toggleButton.addEventListener('click', function() {
-            debugConsole.classList.toggle('minimized');
-        });
-    });
-</script>
+<!-- Debug panel is now permanently visible -->
 <?php endif; ?>
 </body>
 </html>

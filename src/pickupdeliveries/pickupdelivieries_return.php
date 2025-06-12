@@ -107,7 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
             background-color: #f8f9fa;
             box-shadow: -2px 0 10px rgba(0,0,0,0.1);
             overflow-y: auto;
-            transition: transform 0.3s ease-in-out;
             z-index: 1000;
             padding: 15px;
             box-sizing: border-box;
@@ -116,24 +115,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
             text-align: left;
         }
 
-        .debug-panel.minimized {
-            transform: translateX(calc(100% - 30px));
-        }
-
-        .debug-panel-toggle {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px 0 0 4px;
-            padding: 10px;
-            cursor: pointer;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            height: 100px;
+        /* Main content area adjusted to not be hidden by debug panel */
+        body {
+            padding-right: 22%; /* Slightly more than debug panel width */
         }
 
         .container {
@@ -216,7 +200,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
 
         <?php if (isset($config['debug']) && $config['debug'] === true): ?>
         <div id="debugConsole" class="debug-panel">
-            <button id="toggleDebugConsole" class="debug-panel-toggle">Show/Hide Debug</button>
             <div style="margin-bottom: 10px;">
                 <h3 style="margin: 0;">API Request/Response Log</h3>
             </div>
@@ -227,20 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendingmachine'])) {
                 <p><strong>Response Body:</strong><br><?= htmlspecialchars($apiResponse ?? 'No response data') ?></p>
             </div>
         </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const toggleButton = document.getElementById('toggleDebugConsole');
-                const debugConsole = document.getElementById('debugConsole');
-
-                // Initialize as minimized if preferred
-                debugConsole.classList.add('minimized');
-
-                toggleButton.addEventListener('click', function() {
-                    debugConsole.classList.toggle('minimized');
-                });
-            });
-        </script>
+        <!-- Debug panel is now permanently visible -->
         <?php endif; ?>
 
         <a href="../index.php" class="back-button">Back to main menu</a>
