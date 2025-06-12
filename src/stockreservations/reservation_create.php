@@ -20,7 +20,13 @@ foreach ($quantities as $sku => $qty) {
 
 // timestamps
 $now = (new DateTime())->format('c');
-$expiration = (new DateTime('+24 hours'))->format('c');
+
+// Use the selected expiration date if provided, otherwise default to 2 days from now
+if (isset($_POST['expirationDate']) && !empty($_POST['expirationDate'])) {
+    $expiration = (new DateTime($_POST['expirationDate']))->format('c');
+} else {
+    $expiration = (new DateTime('+2 days'))->format('c');
+}
 
 // genereer unieke unlockcode
 function generateUnlockCode() {

@@ -58,6 +58,22 @@ $apiDebugInfo = [
 <head>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Set default expiration date to 2 days from now
+            const expirationDateInput = document.getElementById('expirationDate');
+            if (expirationDateInput) {
+                const now = new Date();
+                const twoDaysFromNow = new Date(now.getTime() + (2 * 24 * 60 * 60 * 1000));
+
+                // Format date to YYYY-MM-DDThh:mm
+                const year = twoDaysFromNow.getFullYear();
+                const month = String(twoDaysFromNow.getMonth() + 1).padStart(2, '0');
+                const day = String(twoDaysFromNow.getDate()).padStart(2, '0');
+                const hours = String(twoDaysFromNow.getHours()).padStart(2, '0');
+                const minutes = String(twoDaysFromNow.getMinutes()).padStart(2, '0');
+
+                expirationDateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+
             // Handle image errors
             document.querySelectorAll("img").forEach(img => {
                 img.onerror = () => {
@@ -202,6 +218,10 @@ $apiDebugInfo = [
     <input type="hidden" name="ticket" value="<?= htmlspecialchars($orderNr) ?>">
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
         <button type="submit" form="reserveForm" style="padding: 10px 20px; font-size: 16px; margin-right: 15px;">Reserve Selected Items</button>
+        <label style="display: inline-flex; align-items: center; margin-right: 15px;">
+            <span style="margin-right: 10px; font-weight: bold;">Expire on:</span>
+            <input type="datetime-local" name="expirationDate" id="expirationDate" form="reserveForm" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+        </label>
         <label class="toggle-switch" style="display: inline-flex; align-items: center; cursor: pointer;">
             <span style="margin-right: 10px; font-weight: bold;">Prepaid?</span>
             <input type="checkbox" name="isPaid" value="1" style="position: absolute; opacity: 0; width: 0; height: 0;">
