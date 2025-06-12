@@ -2,12 +2,14 @@
 
 ## Overview
 
-The Innovend Example App is a demonstration application to help developers getting started using our API's.
+The Innovend Example App is a demonstration application to help developers get started using Innovend's APIs. Innovend provides smart vending and locker solutions for businesses, and this example app showcases how to integrate with our platform.
 
 The application serves as a mock server to demonstrate various workflows:
 - Product reservation process
 - Reservation status tracking
 - Return to locker functionality
+
+This example app is designed to help you understand the API integration points and test your implementation before connecting to the production environment.
 
 ## Features
 
@@ -39,35 +41,11 @@ docker-compose up -d
 If you prefer to run the application directly without Docker, you need to ensure your PHP environment has the required extensions:
 
 1. PHP 8.0 or higher
-2. SQLite3 extension enabled
 3. cURL extension enabled
-
-#### Enabling SQLite3 in PHP Configuration
-
-If you encounter the error `Class "SQLite3" not found`, it means that the SQLite3 PHP extension is not enabled in your PHP environment.
-
-##### For Windows:
-
-1. Locate your PHP installation directory (e.g., `C:\xampp\php` or `C:\php`)
-2. Find the `php.ini` file in that directory
-3. Open the file in a text editor
-4. Search for `;extension=sqlite3` (note the semicolon at the beginning)
-5. Remove the semicolon to uncomment the line, so it becomes `extension=sqlite3`
-6. Save the file
-7. Restart your web server
-
-##### For macOS/Linux:
-
-1. Find your PHP configuration file with `php --ini`
-2. Open the php.ini file in a text editor
-3. Search for `;extension=sqlite3`
-4. Remove the semicolon to uncomment the line
-5. Save the file
-6. Restart your web server
 
 ##### Verifying SQLite3 is Enabled
 
-To verify that SQLite3 is properly enabled, you can create a simple PHP file with the following content:
+To verify that PHP and Curl are properly enabled, you can create a simple PHP file with the following content:
 
 ```php
 <?php
@@ -117,7 +95,6 @@ The project is organized into the following directories and files:
 - `docker-compose.yml` - Docker configuration for running the application
 - `src/` - Main application code
   - `index.php` - Main entry point of the application
-  - `setup.php` - Initial setup and configuration script
   - `conf/` - Configuration files and editor
     - `config-example.json` - Example configuration template
     - `config.json` - Application configuration file
@@ -134,3 +111,26 @@ The project is organized into the following directories and files:
     - `pickupdeliveries_overview.php` - Shows overview of pickup deliveries
     - `pickupdeliveries_start.php` - Initiates pickup delivery process
     - `pickupdelivieries_return.php` - Handles return to locker functionality
+
+## Support and Contributing
+
+### Getting Help
+
+If you encounter any issues or have questions about using this example application:
+
+1. Check the [Innovend Developer Documentation](https://www.postman.com/innovend/vendingweb-developer-portal-public/overview) for comprehensive guides and API references
+2. Contact our support team at development@innovend.eu
+
+### Contributing
+
+We welcome contributions to improve this example application:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### License
+
+This example application is provided under the MIT License. See the LICENSE file for details.
