@@ -81,6 +81,22 @@ $apiDebugInfo = [
                     }
                 });
             });
+
+            // Handle toggle switch for Prepaid
+            const toggleSwitch = document.querySelector('.toggle-switch');
+            const toggleInput = toggleSwitch.querySelector('input[type="checkbox"]');
+            const toggleSlider = toggleSwitch.querySelector('.toggle-slider span');
+
+            toggleSwitch.addEventListener('click', function() {
+                toggleInput.checked = !toggleInput.checked;
+                if (toggleInput.checked) {
+                    toggleSlider.style.transform = 'translateX(26px)';
+                    toggleSwitch.querySelector('.toggle-slider').style.backgroundColor = '#4CAF50';
+                } else {
+                    toggleSlider.style.transform = 'translateX(0)';
+                    toggleSwitch.querySelector('.toggle-slider').style.backgroundColor = '#ccc';
+                }
+            });
         });
     </script>
     <meta charset="UTF-8">
@@ -184,7 +200,16 @@ $apiDebugInfo = [
 <form id="reserveForm" method="POST" action="reservation_create.php" style="display: inline-block;">
     <input type="hidden" name="machineId" value="<?= $machineId ?>">
     <input type="hidden" name="ticket" value="<?= htmlspecialchars($orderNr) ?>">
-    <button type="submit" form="reserveForm" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px;">Reserve Selected Items</button>
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <button type="submit" form="reserveForm" style="padding: 10px 20px; font-size: 16px; margin-right: 15px;">Reserve Selected Items</button>
+        <label class="toggle-switch" style="display: inline-flex; align-items: center; cursor: pointer;">
+            <span style="margin-right: 10px; font-weight: bold;">Prepaid?</span>
+            <input type="checkbox" name="isPaid" value="1" style="position: absolute; opacity: 0; width: 0; height: 0;">
+            <span class="toggle-slider" style="position: relative; display: inline-block; width: 60px; height: 34px; background-color: #ccc; border-radius: 34px; transition: .4s;">
+                <span style="position: absolute; content: ''; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; border-radius: 50%; transition: .4s;"></span>
+            </span>
+        </label>
+    </div>
 </form>
 
 <div style="clear: both; width: 100%;"></div>

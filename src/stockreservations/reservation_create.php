@@ -4,6 +4,7 @@ $config = json_decode(file_get_contents('../conf/config.json'), true);
 $machineId = intval($_POST['machineId']);
 $quantities = $_POST['quantity'] ?? [];
 $orderNr = $_POST['ticket'] ?? 'UNKNOWN';
+$isPaid = isset($_POST['isPaid']) ? true : false;
 
 // Convert quantities to individual product entries
 $products = [];
@@ -27,7 +28,7 @@ function generateUnlockCode() {
 }
 
 // functie om reservering te maken
-function createReservation($config, $machineId, $orderNr, $products, $now, $expiration) {
+function createReservation($config, $machineId, $orderNr, $products, $now, $expiration, $isPaid) {
     $unlockCode = generateUnlockCode();
 
     // Create individual product entries
@@ -47,7 +48,7 @@ function createReservation($config, $machineId, $orderNr, $products, $now, $expi
             "ExpirationDate" => $expiration,
             "UnlockCode" => $unlockCode,
             "OrderNr" => $orderNr,
-            "IsPaid" => false,
+            "IsPaid" => $isPaid,
             "Products" => $productEntries
         ]
     ]);
@@ -176,7 +177,7 @@ $maxAttempts = 5;
 $apiPayload = null;
 $apiUrl = null;
 for ($i = 0; $i < $maxAttempts; $i++) {
-    [$status, $response, $code, $apiPayload, $apiUrl] = createReservation($config, $machineId, $orderNr, $products, $now, $expiration);
+    [$status, $response, $code, $apiPayload, $apiUrl] = createReservation($config, $machineId, $orderNr, $products, $now, $expiration, $isPaid);
     if ($status === 200) {
         $productCount = count($products);
         echo "
