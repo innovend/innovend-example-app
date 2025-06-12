@@ -289,6 +289,19 @@ function getStatusText($statusId) {
             color: #616161;
         }
 
+        .paid-status {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .paid-true {
+            color: #2e7d32; /* Green color */
+        }
+
+        .paid-false {
+            color: #c62828; /* Red color */
+        }
+
         .unlock-code {
             font-family: monospace;
             font-size: 16px;
@@ -451,6 +464,7 @@ function getStatusText($statusId) {
                     <th>Serial Number ↕</th>
                     <th>Unlock Code ↕</th>
                     <th>OrderNr ↕</th>
+                    <th>Prepaid ↕</th>
                     <th>First Name ↕</th>
                     <th>Last Name ↕</th>
                     <th>Acties</th>
@@ -503,6 +517,15 @@ function getStatusText($statusId) {
                             <td><?= !empty($serialNumbers) ? implode('<br>', $serialNumbers) : '-' ?></td>
                             <td><span class="unlock-code"><?= htmlspecialchars($reservation['UnlockCode'] ?: '-') ?></span></td>
                             <td><?= htmlspecialchars($reservation['OrderNr'] ?: '-') ?></td>
+                            <td>
+                                <?php if (isset($reservation['IsPaid'])): ?>
+                                    <span class="paid-status <?= $reservation['IsPaid'] ? 'paid-true' : 'paid-false' ?>">
+                                        <?= $reservation['IsPaid'] ? '✓' : '✗' ?>
+                                    </span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
                             <td><?= htmlspecialchars($reservation['FirstName'] ?: '-') ?></td>
                             <td><?= htmlspecialchars($reservation['LastName'] ?: '-') ?></td>
                             <td>
